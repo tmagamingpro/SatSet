@@ -6,13 +6,14 @@ import Button from "../components/Button";
 import AppIcon from "../components/AppIcon";
 
 const ProviderHome = () => {
-  const { currentUser, orders, setScreen } = useApp();
+  const { currentUser, orders, setScreen, updateUser, showToast } = useApp();
   const myJobs = orders.filter(o => o.providerId === currentUser?.id);
   const stats = {
     pending: myJobs.filter(o => o.status === "menunggu").length,
     active: myJobs.filter(o => o.status === "berlangsung").length,
     done: myJobs.filter(o => o.status === "selesai").length,
   };
+  const isActiveNow = currentUser?.isActive !== false;
 
   return (
     <div className="pb-20">
@@ -23,8 +24,21 @@ const ProviderHome = () => {
           {currentUser?.isVerified
             ? <Badge color="#22C55E"><span className="inline-flex items-center gap-1"><AppIcon name="badgeCheck" size={13} /> Akun Terverifikasi</span></Badge>
             : <Badge color="#F59E0B"><span className="inline-flex items-center gap-1"><AppIcon name="clock" size={13} /> Menunggu Verifikasi</span></Badge>}
+          {isActiveNow
+            ? <Badge color="#0EA5E9"><span className="inline-flex items-center gap-1"><AppIcon name="zap" size={13} /> Aktif</span></Badge>
+            : <Badge color="#64748B"><span className="inline-flex items-center gap-1"><AppIcon name="clock" size={13} /> Offline</span></Badge>}
           <Stars rating={currentUser?.rating || 0} />
         </div>
+        <button
+          onClick={() => {
+            updateUser(currentUser.id, { isActive: !isActiveNow });
+            showToast(!isActiveNow ? "Status diubah ke aktif." : "Status diubah ke offline.", "success");
+          }}
+          className={`mt-3 py-2 px-3.5 rounded-lg border-none text-xs font-semibold cursor-pointer
+            ${isActiveNow ? "bg-slate-800 text-white" : "bg-sky-500 text-white"}`}
+        >
+          {isActiveNow ? "Set Offline" : "Set Aktif"}
+        </button>
       </div>
 
       <div className="px-5 -mt-5">

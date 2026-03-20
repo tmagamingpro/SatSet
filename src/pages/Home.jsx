@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import Card from "../components/Card";
 import Avatar from "../components/Avatar";
@@ -6,8 +7,30 @@ import Stars from "../components/Stars";
 import { CATEGORIES } from "../utils/constants";
 
 const Home = () => {
-  const { currentUser, users, setScreen, setSelectedProvider } = useApp();
-  const providers = users.filter(u => u.role === "penyedia" && u.isVerified);
+  const { currentUser, users, orders, setScreen, setSelectedProvider } = useApp();
+  const providers = users.filter((u) => u.role === "penyedia" && u.isVerified && u.isActive);
+  const myRecentOrders = useMemo(
+    () =>
+      orders
+        .filter((order) => order.customerId === currentUser?.id)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 3),
+    [orders, currentUser?.id],
+  );
+  const [currentTime, setCurrentTime] = useState(() =>
+    new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+  );
+  const topProviders = useMemo(
+    () => [...providers].sort((a, b) => b.rating - a.rating).slice(0, 3),
+    [providers],
+  );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }));
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="pb-20">
@@ -18,8 +41,8 @@ const Home = () => {
             <h1 className="text-2xl font-extrabold text-white">{currentUser?.name?.split(" ")[0]}</h1>
           </div>
           <div className="bg-white/10 rounded-lg px-3.5 py-2 flex items-center gap-1.5">
-            <AppIcon name="mapPin" size={16} className="text-white/80" />
-            <span className="text-white text-sm font-medium">Palembang</span>
+            <AppIcon name="clock" size={16} className="text-white/80" />
+            <span className="text-white text-sm font-medium">{currentTime}</span>
           </div>
         </div>
         <div
@@ -36,8 +59,8 @@ const Home = () => {
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { label: "Penyedia", value: providers.length, icon: "hardHat", color: "#0284C7" },
-            { label: "Kategori", value: CATEGORIES.length, icon: "clipboard", color: "#2196F3" },
-            { label: "Rating avg", value: "4.7", icon: "star", color: "#FFC107" },
+            { label: "Kategori", value: CATEGORIES.length, icon: "clipboard", color: "#0369A1" },
+            { label: "Rating avg", value: "4.7", icon: "star", color: "#0D9488" },
           ].map(s => (
             <Card key={s.label} className="text-center py-4 px-2">
               <div className="flex justify-center mb-1 text-slate-500">
@@ -49,13 +72,110 @@ const Home = () => {
           ))}
         </div>
 
+        <Card className="mb-6 p-4 bg-gradient-to-r from-sky-600 to-cyan-500 text-white border-none">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs text-white/80">Butuh bantuan cepat?</p>
+              <h3 className="font-bold text-base mt-0.5">Cari pekerja aktif di sekitarmu</h3>
+              <p className="text-[11px] text-white/80 mt-1">
+                {providers.length} penyedia aktif siap menerima pekerjaan
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setScreen("search")}
+              className="h-10 px-3.5 rounded-lg bg-white text-sky-700 text-sm font-bold border-none cursor-pointer whitespace-nowrap"
+            >
+              Mulai Cari
+            </button>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Card className="p-3.5 bg-gradient-to-r from-emerald-50 to-cyan-50">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <AppIcon name="zap" size={15} />
+              </div>
+              <div>
+                <p className="text-[11px] text-gray-400">Sedang Aktif</p>
+                <p className="text-sm font-bold text-slate-800">{providers.length} penyedia</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-3.5 bg-gradient-to-r from-sky-50 to-cyan-50">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center">
+                <AppIcon name="badgeCheck" size={15} />
+              </div>
+              <div>
+                <p className="text-[11px] text-gray-400">Terverifikasi</p>
+                <p className="text-sm font-bold text-slate-800">{providers.length} akun</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <h3 className="font-bold text-base mb-3.5">Aksi Cepat</h3>
+        <div className="grid grid-cols-3 gap-2.5 mb-7">
+          {[
+            { label: "Cari Jasa", icon: "search", to: "search", color: "#0EA5E9" },
+            { label: "Pesanan", icon: "clipboard", to: "orders", color: "#0D9488" },
+            { label: "Profil", icon: "user", to: "profile", color: "#0369A1" },
+          ].map((action) => (
+            <button
+              key={action.label}
+              onClick={() => setScreen(action.to)}
+              className="bg-white border border-sky-100 rounded-xl p-3 cursor-pointer text-left hover:shadow-sm transition-all"
+            >
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center mb-2"
+                style={{ background: `${action.color}20`, color: action.color }}
+              >
+                <AppIcon name={action.icon} size={16} />
+              </div>
+              <p className="text-xs font-semibold text-slate-700">{action.label}</p>
+            </button>
+          ))}
+        </div>
+
+        <Card className="mb-3 p-4 bg-gradient-to-r from-emerald-50 to-cyan-50 border border-emerald-100">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold text-emerald-700">Tips SatSet</p>
+              <h3 className="font-bold text-slate-800 mt-1">Biar dapat penyedia yang pas</h3>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Tulis kebutuhan sedetail mungkin, tentukan radius, lalu bandingkan rating dan jumlah pekerjaan.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setScreen("search")}
+              className="h-9 px-3 rounded-lg bg-emerald-500 text-white text-xs font-bold border-none cursor-pointer whitespace-nowrap"
+            >
+              Coba Sekarang
+            </button>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-2 gap-3 mb-7">
+          <Card className="p-3.5">
+            <p className="text-[11px] text-gray-400 mb-1">Tips #1</p>
+            <p className="text-xs font-semibold text-slate-700">Pilih kategori paling spesifik agar hasil lebih akurat.</p>
+          </Card>
+          <Card className="p-3.5">
+            <p className="text-[11px] text-gray-400 mb-1">Tips #2</p>
+            <p className="text-xs font-semibold text-slate-700">Cek status aktif penyedia sebelum mengirim permintaan.</p>
+          </Card>
+        </div>
+
         <h3 className="font-bold text-base mb-3.5">Kategori Layanan</h3>
         <div className="grid grid-cols-4 gap-2.5 mb-7">
           {CATEGORIES.map(cat => (
             <button
               key={cat.id}
               onClick={() => setScreen("search")}
-              className="bg-white border border-gray-100 rounded-lg py-3 px-1.5 cursor-pointer flex flex-col items-center gap-1 transition-all hover:shadow-md"
+              className="bg-gradient-to-b from-white to-sky-50/40 border border-sky-100 rounded-lg py-3 px-1.5 cursor-pointer flex flex-col items-center gap-1 transition-all hover:shadow-md"
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: cat.color + "18" }}>
                 <AppIcon name={cat.icon} size={18} className="text-slate-700" />
@@ -72,7 +192,7 @@ const Home = () => {
           </button>
         </div>
         <div className="flex flex-col gap-3">
-          {providers.sort((a, b) => b.rating - a.rating).slice(0, 3).map(p => (
+          {topProviders.map(p => (
             <Card key={p.id} onClick={() => { setSelectedProvider(p); setScreen("provider-detail"); }} className="p-4">
               <div className="flex gap-3 items-center">
                 <Avatar name={p.name} size={48} colorIndex={p.id} />
@@ -91,6 +211,57 @@ const Home = () => {
               </div>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-7">
+          <div className="flex justify-between items-center mb-3.5">
+            <h3 className="font-bold text-base">Aktivitas Terbaru</h3>
+            <button
+              type="button"
+              onClick={() => setScreen("orders")}
+              className="bg-transparent border-none text-sky-600 text-sm font-semibold cursor-pointer inline-flex items-center gap-1"
+            >
+              Lihat pesanan <AppIcon name="arrowRight" size={14} />
+            </button>
+          </div>
+
+          {myRecentOrders.length === 0 ? (
+            <Card className="p-4">
+              <p className="text-sm text-gray-500">Belum ada aktivitas pesanan. Yuk mulai cari jasa pertama kamu.</p>
+            </Card>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {myRecentOrders.map((order) => (
+                <Card key={order.id} className="p-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{order.service}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{order.location}</p>
+                    </div>
+                    <span
+                      className="text-[11px] font-bold px-2 py-1 rounded-full"
+                      style={{
+                        background:
+                          order.status === "selesai"
+                            ? "#DCFCE7"
+                            : order.status === "berlangsung"
+                              ? "#DBEAFE"
+                              : "#FEF3C7",
+                        color:
+                          order.status === "selesai"
+                            ? "#166534"
+                            : order.status === "berlangsung"
+                              ? "#1D4ED8"
+                              : "#92400E",
+                      }}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

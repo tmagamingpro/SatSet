@@ -7,7 +7,7 @@ import AppIcon from "../components/AppIcon";
 import { formatTime } from "../utils/format";
 
 const Chat = () => {
-  const { currentUser, users, chats, addChat } = useApp();
+  const { currentUser, users, chats, addChat, setHideNavbar } = useApp();
   const [selectedChat, setSelectedChat] = useState(null);
   const [msg, setMsg] = useState("");
   const msgRef = useRef(null);
@@ -27,6 +27,11 @@ const Chat = () => {
   useEffect(() => {
     if (msgRef.current) msgRef.current.scrollTop = msgRef.current.scrollHeight;
   }, [chats, selectedChat]);
+
+  useEffect(() => {
+    setHideNavbar(Boolean(selectedChat));
+    return () => setHideNavbar(false);
+  }, [selectedChat, setHideNavbar]);
 
   if (selectedChat) {
     const messages = getMessages(selectedChat.id);

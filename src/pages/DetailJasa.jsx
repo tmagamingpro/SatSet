@@ -60,7 +60,7 @@ const DetailJasa = () => {
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <h3 className="font-bold mb-3">Informasi</h3>
           {[
-            ["Lokasi", p.address, "mapPin"],
+            ["Lokasi Kantor", p.officeLocation || p.address, "mapPin"],
             ["Telepon", p.phone, "phone"],
           ].map(([k, v, icon]) => (
             <div key={k} className="flex gap-2 mb-2">

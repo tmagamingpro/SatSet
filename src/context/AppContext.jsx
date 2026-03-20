@@ -14,17 +14,23 @@ export const AppProvider = ({ children }) => {
   const [screen, setScreen] = useState("login");
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [toast, setToast] = useState(null);
+  const [hideNavbar, setHideNavbar] = useState(false);
 
-  const login = (user) => { setCurrentUser(user); setScreen("home"); };
-  const logout = () => { setCurrentUser(null); setScreen("login"); };
+  const login = (user) => { setCurrentUser(user); setScreen("home"); setHideNavbar(false); };
+  const logout = () => { setCurrentUser(null); setScreen("login"); setHideNavbar(false); };
   const showToast = (message, type = "success") => setToast({ message, type });
 
   const addUser = (data) => {
     if (users.find(u => u.email === data.email)) return false;
+    const isProvider = data.role === "penyedia";
     const newUser = {
       id: Date.now(), ...data,
       avatar: data.name.slice(0, 2).toUpperCase(),
       isVerified: data.role === "pencari",
+      isActive: isProvider,
+      officeLocation: isProvider ? data.officeLocation : "",
+      lat: isProvider ? data.lat : null,
+      lng: isProvider ? data.lng : null,
       skills: [], rating: 0, totalJobs: 0,
       createdAt: new Date().toISOString(),
     };
@@ -54,6 +60,7 @@ export const AppProvider = ({ children }) => {
   const ctx = {
     users, orders, chats, notifications, currentUser,
     screen, setScreen, selectedProvider, setSelectedProvider,
+    hideNavbar, setHideNavbar,
     toast, setToast,
     login, logout, showToast,
     addUser, updateUser, deleteUser,

@@ -14,7 +14,7 @@ export const authService = {
 };
 
 export const userService = {
-  getProviders: (users) => users.filter(u => u.role === "penyedia" && u.isVerified),
+  getProviders: (users) => users.filter(u => u.role === "penyedia" && u.isVerified && u.isActive),
   getByRole: (users, role) => users.filter(u => u.role === role),
   getById: (users, id) => users.find(u => u.id === id),
 };
