@@ -2,7 +2,17 @@
 // MOCK DATABASE / INITIAL STATE
 // ============================================================
 export const INITIAL_USERS = [
-  { id: 1, name: "Ahmad Rizki", email: "pencari@test.com", password: "123456", role: "pencari", avatar: "AR", phone: "081234567890", address: "Jl. Merdeka No. 5, Palembang", createdAt: "2025-01-10" },
+  { 
+    id: 1, 
+    name: "Tegar Afrian", 
+    email: "pencari@test.com", 
+    password: "123456", 
+    role: "pencari", 
+    avatar: "TA", 
+    phone: "081234567890", 
+    address: "Jl. Darussalam 7, Muara Enim", 
+    createdAt: "2025-01-10" 
+  },
   {
     id: 2,
     name: "Budi Santoso",
@@ -22,7 +32,14 @@ export const INITIAL_USERS = [
     isActive: true,
     createdAt: "2025-01-05",
   },
-  { id: 3, name: "Admin SatSet", email: "admin@satset.com", password: "admin123", role: "admin", avatar: "AS", createdAt: "2024-12-01" },
+  { 
+    id: 3, 
+    name: "Admin SatSet", 
+    email: "admin@satset.com", 
+    password: "admin123", role: "admin", 
+    avatar: "AS", 
+    createdAt: "2024-12-01" 
+  },
   {
     id: 4,
     name: "Citra Dewi",
@@ -122,7 +139,7 @@ export const STATUS_COLORS = {
 };
 
 export const MOCK_REPORTS = [
-  { id: 1, from: "Ahmad Rizki", type: "Penyedia Jasa", desc: "Penyedia tidak datang sesuai jadwal", date: "2025-03-10" },
+  { id: 1, from: "Tegar Afrian", type: "Penyedia Jasa", desc: "Penyedia tidak datang sesuai jadwal", date: "2025-03-10" },
   { id: 2, from: "Budi S.", type: "Aplikasi", desc: "Bug pada fitur notifikasi tidak muncul", date: "2025-03-12" },
   { id: 3, from: "Citra D.", type: "Pencari Jasa", desc: "Pencari membatalkan tanpa alasan berkali-kali", date: "2025-03-14" },
 ];
