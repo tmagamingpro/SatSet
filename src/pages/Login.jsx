@@ -15,6 +15,7 @@ const Login = () => {
   const [showRegister, setShowRegister] = useState(false);
 
   const handleLogin = () => {
+    setError("");
     const user = users.find(u => u.email === email && u.password === password);
     if (!user) { setError("Email atau password salah."); return; }
     if (user.role === "penyedia" && !user.isVerified) { setError("Akun belum diverifikasi oleh admin."); return; }
@@ -38,8 +39,22 @@ const Login = () => {
             <h2 className="text-2xl font-bold mb-1">Masuk</h2>
             <p className="text-gray-400 text-sm mb-6">Selamat datang kembali</p>
             <div className="flex flex-col gap-4">
-              <Input label="Email" type="email" value={email} onChange={setEmail} placeholder="nama@email.com" icon={<AppIcon name="mail" size={16} />} />
-              <Input label="Password" type="password" value={password} onChange={setPassword} placeholder="********" icon={<AppIcon name="lock" size={16} />} />
+              <Input
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(value) => { setEmail(value); if (error) setError(""); }}
+                placeholder="nama@email.com"
+                icon={<AppIcon name="mail" size={16} />}
+              />
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(value) => { setPassword(value); if (error) setError(""); }}
+                placeholder="********"
+                icon={<AppIcon name="lock" size={16} />}
+              />
               {error && (
                 <div className="bg-red-50 border border-red-400 rounded-lg px-3.5 py-2.5 text-red-500 text-sm">{error}</div>
               )}
@@ -47,14 +62,21 @@ const Login = () => {
             </div>
             <div className="text-center mt-5 pt-4 border-t border-gray-100">
               <span className="text-sm text-gray-400">Belum punya akun? </span>
-              <button onClick={() => setShowRegister(true)} className="bg-transparent border-none text-sky-600 font-semibold cursor-pointer text-sm">Daftar Sekarang</button>
+              <button
+                type="button"
+                onClick={() => { setError(""); setShowRegister(true); }}
+                className="bg-transparent border-none text-sky-600 font-semibold cursor-pointer text-sm"
+              >
+                Daftar Sekarang
+              </button>
             </div>
             <div className="mt-5 p-3.5 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-400 font-semibold mb-2">AKUN DEMO</p>
               {DEMO_ACCOUNTS.map(a => (
                 <button
+                  type="button"
                   key={a.email}
-                  onClick={() => { setEmail(a.email); setPassword(a.pw); }}
+                  onClick={() => { setError(""); setEmail(a.email); setPassword(a.pw); }}
                   className="block w-full text-left px-2.5 py-1.5 bg-transparent border-none cursor-pointer rounded text-xs text-sky-600 font-medium hover:bg-sky-50"
                 >
                   {a.label} ({a.email})

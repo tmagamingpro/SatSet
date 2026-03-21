@@ -23,6 +23,7 @@ export const INITIAL_USERS = [
     phone: "085678901234",
     address: "Jl. Sudirman No. 12, Palembang",
     officeLocation: "Ilir Barat I, Palembang",
+    experience: "7 tahun menangani instalasi listrik rumah, kantor, dan troubleshooting AC.",
     lat: -2.9832,
     lng: 104.7488,
     skills: ["Instalasi Listrik", "Perbaikan AC"],
@@ -50,6 +51,7 @@ export const INITIAL_USERS = [
     phone: "087890123456",
     address: "Jl. Ahmad Yani No. 8, Palembang",
     officeLocation: "Kemuning, Palembang",
+    experience: "5 tahun pengalaman jasa kebersihan rumah, apartemen, dan layanan setrika harian.",
     lat: -2.9547,
     lng: 104.7432,
     skills: ["Kebersihan Rumah", "Setrika"],
@@ -69,6 +71,7 @@ export const INITIAL_USERS = [
     phone: "082345678901",
     address: "Jl. Kertapati No. 3, Palembang",
     officeLocation: "Kertapati, Palembang",
+    experience: "3 tahun di layanan pindahan rumah, angkut furnitur, dan bongkar muat barang.",
     lat: -3.0226,
     lng: 104.7434,
     skills: ["Pindahan Rumah", "Angkut Barang"],
@@ -88,6 +91,7 @@ export const INITIAL_USERS = [
     phone: "083456789012",
     address: "Jl. Demang No. 15, Palembang",
     officeLocation: "Sukarami, Palembang",
+    experience: "8 tahun pengalaman memasak rumahan, katering acara keluarga, dan meal prep mingguan.",
     lat: -2.9288,
     lng: 104.7238,
     skills: ["Memasak", "Catering"],
@@ -103,6 +107,8 @@ export const INITIAL_ORDERS = [
   { id: 1, customerId: 1, providerId: 2, service: "Instalasi Listrik", description: "Pasang stopkontak 3 titik di ruang tamu", location: "Jl. Bukit Besar No. 7", status: "selesai", createdAt: "2025-02-10", completedAt: "2025-02-10", price: 150000 },
   { id: 2, customerId: 1, providerId: 4, service: "Kebersihan Rumah", description: "Bersihkan 3 kamar + ruang tamu", location: "Jl. Merdeka No. 5", status: "berlangsung", createdAt: "2025-03-01", price: 200000 },
   { id: 3, customerId: 1, providerId: 6, service: "Memasak", description: "Masak untuk acara 30 orang", location: "Jl. Merdeka No. 5", status: "menunggu", createdAt: "2025-03-15", price: 500000 },
+  { id: 4, customerId: 1, providerId: 2, service: "Perbaikan AC", description: "AC kamar tidak dingin, mohon cek freon dan pembersihan", location: "Jl. Angkatan 45 No. 18", status: "menunggu", createdAt: "2025-03-18", price: 250000 },
+  { id: 5, customerId: 1, providerId: 2, service: "Instalasi Listrik", description: "Tambahkan MCB untuk dapur dan jalur lampu teras", location: "Jl. Rajawali No. 22", status: "berlangsung", createdAt: "2025-03-16", price: 300000 },
 ];
 
 export const CATEGORIES = [
@@ -143,5 +149,3 @@ export const MOCK_REPORTS = [
   { id: 2, from: "Budi S.", type: "Aplikasi", desc: "Bug pada fitur notifikasi tidak muncul", date: "2025-03-12" },
   { id: 3, from: "Citra D.", type: "Pencari Jasa", desc: "Pencari membatalkan tanpa alasan berkali-kali", date: "2025-03-14" },
 ];
-
-

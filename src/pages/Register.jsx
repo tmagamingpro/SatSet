@@ -15,6 +15,7 @@ const Register = ({ onBack }) => {
     phone: "",
     role: "pencari",
     officeLocation: "",
+    experience: "",
     lat: null,
     lng: null,
   });
@@ -67,6 +68,7 @@ const Register = ({ onBack }) => {
       ...prev,
       role,
       officeLocation: role === "penyedia" ? prev.officeLocation : "",
+      experience: role === "penyedia" ? prev.experience : "",
       lat: role === "penyedia" ? prev.lat : null,
       lng: role === "penyedia" ? prev.lng : null,
     }));
@@ -83,6 +85,7 @@ const Register = ({ onBack }) => {
             { key: "penyedia", label: "Penyedia Jasa", icon: "hardHat" },
           ].map(r => (
             <button
+              type="button"
               key={r.key}
               onClick={() => handleRoleChange(r.key)}
               className={`flex-1 py-2.5 rounded-lg cursor-pointer border-2 font-semibold text-sm transition-all inline-flex items-center justify-center gap-1.5
@@ -99,20 +102,33 @@ const Register = ({ onBack }) => {
         <Input label="Password" type="password" value={form.password} onChange={v => setForm(f => ({ ...f, password: v }))} placeholder="Min. 6 karakter" icon={<AppIcon name="lock" size={16} />} required />
         <Input label="No. Telepon" value={form.phone} onChange={v => setForm(f => ({ ...f, phone: v }))} placeholder="08xxxxxxxxxx" icon={<AppIcon name="phone" size={16} />} required />
         {form.role === "penyedia" && (
-          <Input
-            label="Alamat Kantor"
-            value={form.officeLocation}
-            onChange={(value) => setForm((prev) => ({ ...prev, officeLocation: value }))}
-            placeholder="Contoh: Jl Sudirman No 12, Ilir Barat I, Palembang"
-            icon={<AppIcon name="mapPin" size={16} />}
-            required
-          />
+          <>
+            <Input
+              label="Alamat Kantor"
+              value={form.officeLocation}
+              onChange={(value) => setForm((prev) => ({ ...prev, officeLocation: value }))}
+              placeholder="Contoh: Jl Sudirman No 12, Ilir Barat I, Palembang"
+              icon={<AppIcon name="mapPin" size={16} />}
+              required
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-500">Pengalaman Kerja</label>
+              <textarea
+                value={form.experience}
+                onChange={(event) => setForm((prev) => ({ ...prev, experience: event.target.value }))}
+                placeholder="Contoh: 5 tahun menangani instalasi listrik rumah dan kantor"
+                rows={3}
+                className="w-full rounded-lg border-2 border-gray-200 px-3.5 py-2.5 text-sm bg-white text-gray-800 outline-none transition-colors duration-200 focus:border-sky-600"
+              />
+              <p className="text-[11px] text-gray-400">Tuliskan ringkas pengalaman agar pencari jasa lebih yakin.</p>
+            </div>
+          </>
         )}
         {error && (
           <div className="bg-red-50 border border-red-400 rounded-lg px-3.5 py-2.5 text-red-500 text-sm">{error}</div>
         )}
         <Button fullWidth onClick={handleRegister} size="lg">{isSubmitting ? "Memproses..." : "Daftar Sekarang"}</Button>
-        <button onClick={onBack} className="bg-transparent border-none text-gray-400 cursor-pointer text-sm">Kembali ke Login</button>
+        <button type="button" onClick={onBack} className="bg-transparent border-none text-gray-400 cursor-pointer text-sm">Kembali ke Login</button>
       </div>
     </Card>
   );

@@ -16,9 +16,65 @@ export const AppProvider = ({ children }) => {
   const [toast, setToast] = useState(null);
   const [hideNavbar, setHideNavbar] = useState(false);
 
-  const login = (user) => { setCurrentUser(user); setScreen("home"); setHideNavbar(false); };
+  const login = (user) => {
+    if (user?.role === "penyedia") {
+      const existingStatuses = new Set(
+        orders.filter((order) => order.providerId === user.id).map((order) => order.status),
+      );
+      const requiredStatuses = ["menunggu", "berlangsung", "selesai"];
+      const missingStatuses = requiredStatuses.filter((status) => !existingStatuses.has(status));
+
+      if (missingStatuses.length > 0) {
+        const fallbackCustomerId = users.find((u) => u.role === "pencari")?.id || 1;
+        const now = Date.now();
+        const sampleMap = {
+          menunggu: {
+            service: user.skills?.[0] || "Layanan Umum",
+            description: "Contoh order baru yang menunggu respons penyedia jasa.",
+            location: "Jl. Contoh No. 10",
+            price: 180000,
+            createdAt: "2026-03-20",
+          },
+          berlangsung: {
+            service: user.skills?.[1] || user.skills?.[0] || "Layanan Harian",
+            description: "Contoh order yang sedang dikerjakan penyedia jasa.",
+            location: "Jl. Anggrek No. 22",
+            price: 260000,
+            createdAt: "2026-03-18",
+          },
+          selesai: {
+            service: user.skills?.[0] || "Layanan Prioritas",
+            description: "Contoh order yang sudah selesai dan siap masuk riwayat.",
+            location: "Jl. Rajawali No. 8",
+            price: 320000,
+            createdAt: "2026-03-14",
+            completedAt: "2026-03-15",
+          },
+        };
+
+        const injectedOrders = missingStatuses.map((status, index) => ({
+          id: now + index + 1,
+          customerId: fallbackCustomerId,
+          providerId: user.id,
+          status,
+          ...sampleMap[status],
+        }));
+        setOrders((prev) => [...prev, ...injectedOrders]);
+      }
+    }
+
+    setCurrentUser(user);
+    setScreen("home");
+    setHideNavbar(false);
+  };
   const logout = () => { setCurrentUser(null); setScreen("login"); setHideNavbar(false); };
   const showToast = (message, type = "success") => setToast({ message, type });
+  const addNotification = (userId, message, type = "info") => {
+    setNotifications((prev) => [...prev, { id: Date.now() + Math.random(), userId, message, type, read: false }]);
+  };
+  const markNotificationsAsRead = (userId) => {
+    setNotifications((prev) => prev.map((n) => (n.userId === userId ? { ...n, read: true } : n)));
+  };
 
   const addUser = (data) => {
     if (users.find(u => u.email === data.email)) return false;
@@ -29,6 +85,7 @@ export const AppProvider = ({ children }) => {
       isVerified: data.role === "pencari",
       isActive: isProvider,
       officeLocation: isProvider ? data.officeLocation : "",
+      experience: isProvider ? data.experience || "" : "",
       lat: isProvider ? data.lat : null,
       lng: isProvider ? data.lng : null,
       skills: [], rating: 0, totalJobs: 0,
@@ -50,10 +107,61 @@ export const AppProvider = ({ children }) => {
   const addOrder = (data) => {
     const order = { id: Date.now(), ...data, status: "menunggu", createdAt: new Date().toISOString() };
     setOrders(p => [...p, order]);
-    setNotifications(n => [...n, { id: Date.now(), userId: data.providerId, message: "Ada permintaan jasa baru!", read: false }]);
+    addNotification(data.providerId, "Ada permintaan jasa baru!", "new_request");
   };
 
-  const updateOrder = (id, data) => setOrders(p => p.map(o => o.id === id ? { ...o, ...data } : o));
+  const updateOrder = (id, data) => {
+    const previousOrder = orders.find((o) => o.id === id);
+    if (!previousOrder) return;
+
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...data } : o)));
+
+    const isNowCompleted = data.status === "selesai" && previousOrder.status !== "selesai";
+    if (isNowCompleted && data.completedBy === "provider") {
+      addNotification(
+        previousOrder.customerId,
+        `Pekerjaan "${previousOrder.service}" dinyatakan selesai oleh penyedia jasa.`,
+        "job_completed",
+      );
+      return;
+    }
+
+    if (isNowCompleted && data.completedBy === "customer") {
+      addNotification(
+        previousOrder.providerId,
+        `Pekerjaan "${previousOrder.service}" telah dikonfirmasi selesai oleh pencari jasa.`,
+        "job_completed",
+      );
+      return;
+    }
+
+    const isRejectedByProvider =
+      (data.status === "ditolak" || data.status === "dibatalkan") &&
+      previousOrder.status !== data.status &&
+      data.cancelledBy === "provider";
+    if (isRejectedByProvider) {
+      const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
+      addNotification(
+        previousOrder.customerId,
+        `Pesanan "${previousOrder.service}" dibatalkan oleh penyedia jasa.${reasonText}`,
+        "job_cancelled",
+      );
+      return;
+    }
+
+    const isCancelledByCustomer =
+      data.status === "dibatalkan" &&
+      previousOrder.status !== "dibatalkan" &&
+      data.cancelledBy === "customer";
+    if (isCancelledByCustomer) {
+      const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
+      addNotification(
+        previousOrder.providerId,
+        `Pesanan "${previousOrder.service}" dibatalkan oleh pencari jasa.${reasonText}`,
+        "job_cancelled",
+      );
+    }
+  };
 
   const addChat = (data) => setChats(p => [...p, { id: Date.now(), ...data, createdAt: new Date().toISOString() }]);
 
@@ -63,6 +171,7 @@ export const AppProvider = ({ children }) => {
     hideNavbar, setHideNavbar,
     toast, setToast,
     login, logout, showToast,
+    addNotification, markNotificationsAsRead,
     addUser, updateUser, deleteUser,
     addOrder, updateOrder, addChat,
   };

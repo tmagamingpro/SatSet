@@ -29,7 +29,7 @@ const ProviderHome = () => {
     <div className="pb-20">
       <div className="bg-gradient-to-br from-[#0B1F3A] via-[#123A63] to-[#0E7490] px-5 pt-7 pb-10">
         <p className="text-white/60 text-sm">Selamat datang kembali</p>
-        <h1 className="text-2xl font-extrabold text-white">{currentUser?.name}</h1>
+        <h1 className="text-2xl font-extrabold text-white">{currentUser?.name?.split(" ")[0]}</h1>
         <div className="mt-2 flex items-center gap-2">
           {currentUser?.isVerified
             ? <Badge color="#22C55E"><span className="inline-flex items-center gap-1"><AppIcon name="badgeCheck" size={13} /> Akun Terverifikasi</span></Badge>

@@ -7,7 +7,7 @@ import Stars from "../components/Stars";
 import { CATEGORIES } from "../utils/constants";
 
 const Home = () => {
-  const { currentUser, users, orders, setScreen, setSelectedProvider } = useApp();
+  const { currentUser, users, orders, notifications, markNotificationsAsRead, setScreen, setSelectedProvider } = useApp();
   const providers = users.filter((u) => u.role === "penyedia" && u.isVerified && u.isActive);
   const myRecentOrders = useMemo(
     () =>
@@ -24,6 +24,11 @@ const Home = () => {
     () => [...providers].sort((a, b) => b.rating - a.rating).slice(0, 3),
     [providers],
   );
+  const myUnreadNotifications = useMemo(
+    () => notifications.filter((n) => n.userId === currentUser?.id && !n.read),
+    [notifications, currentUser?.id],
+  );
+  const completedJobNotifications = myUnreadNotifications.filter((n) => n.type === "job_completed");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -115,6 +120,24 @@ const Home = () => {
             </div>
           </Card>
         </div>
+
+        {completedJobNotifications.length > 0 && (
+          <Card
+            className="mb-6 border-2 border-sky-600 bg-sky-50 cursor-pointer"
+            onClick={() => {
+              markNotificationsAsRead(currentUser.id);
+              setScreen("orders");
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-sky-600"><AppIcon name="bell" size={26} /></div>
+              <div>
+                <div className="font-bold text-sky-600">Ada {completedJobNotifications.length} update pekerjaan selesai!</div>
+                <div className="text-sm text-gray-400">Tap untuk melihat detail pesanan</div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <h3 className="font-bold text-base mb-3.5">Aksi Cepat</h3>
         <div className="grid grid-cols-3 gap-2.5 mb-7">

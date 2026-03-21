@@ -71,18 +71,24 @@ const AdminReports = () => {
 
         {filtered.map(r => (
           <Card key={r.id} className="mb-3" onClick={() => openDetail(r)}>
-            <div className="flex justify-between mb-2">
+            <div className="flex justify-between items-start gap-2 mb-2">
               <Badge color={typeColors[r.type] || "#6B6B8A"}>{r.type}</Badge>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Badge color={resolved.includes(r.id) ? "#22C55E" : "#F59E0B"}>
                   {resolved.includes(r.id) ? "Selesai" : "Pending"}
                 </Badge>
                 <span className="text-[11px] text-gray-400">{r.date}</span>
               </div>
             </div>
-            <div className="font-semibold text-sm mb-1">Laporan {r.type}</div>
-            <div className="text-xs text-gray-400 mb-1 inline-flex items-center gap-1"><AppIcon name="user" size={11} /> Dari: {r.from}</div>
-            <div className="text-sm mb-3 inline-flex items-center gap-1"><AppIcon name="clipboard" size={12} /> {r.desc}</div>
+            <div className="font-semibold text-sm mb-1 break-words">Laporan {r.type}</div>
+            <div className="text-xs text-gray-400 mb-2 flex items-start gap-1.5">
+              <AppIcon name="user" size={11} className="mt-0.5 shrink-0" />
+              <span className="break-words leading-relaxed">Dari: {r.from}</span>
+            </div>
+            <div className="text-sm mb-3 flex items-start gap-1.5">
+              <AppIcon name="clipboard" size={12} className="mt-0.5 shrink-0" />
+              <span className="break-words leading-relaxed">{r.desc}</span>
+            </div>
             {!resolved.includes(r.id) && (
               <Button size="sm" variant="success" onClick={(e) => { e.stopPropagation(); handleResolve(r.id); }} icon={<AppIcon name="badgeCheck" size={13} />}>
                 Tandai Selesai
@@ -110,14 +116,14 @@ const AdminReports = () => {
               ].map(([k, v, icon]) => (
                 <div key={k} className="flex gap-2">
                   <span className="text-sm font-semibold text-gray-400 min-w-[80px] inline-flex items-center gap-1"><AppIcon name={icon} size={12} /> {k}</span>
-                  <span className="text-sm">{v}</span>
+                  <span className="text-sm break-words">{v}</span>
                 </div>
               ))}
             </div>
 
             <div className="bg-gray-50 rounded-xl p-3">
               <div className="text-xs font-semibold text-gray-400 mb-1">Deskripsi</div>
-              <div className="text-sm">{selectedReport.desc}</div>
+              <div className="text-sm break-words leading-relaxed">{selectedReport.desc}</div>
             </div>
 
             <div>

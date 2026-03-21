@@ -1,4 +1,4 @@
-const Button = ({ children, variant = "primary", size = "md", onClick, disabled, fullWidth, icon, className = "" }) => {
+const Button = ({ children, variant = "primary", size = "md", type = "button", onClick, disabled, fullWidth, icon, className = "" }) => {
   const base = `inline-flex items-center justify-center gap-2 font-semibold border-none transition-all duration-200 rounded-lg cursor-pointer
     ${disabled ? "opacity-60 cursor-not-allowed" : "hover:opacity-90 active:scale-95"}
     ${fullWidth ? "w-full" : ""}`;
@@ -20,6 +20,7 @@ const Button = ({ children, variant = "primary", size = "md", onClick, disabled,
 
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}

@@ -14,6 +14,12 @@ const DetailJasa = () => {
   const [form, setForm] = useState({ service: "", description: "", location: currentUser?.address || "", price: "" });
   const p = selectedProvider;
   if (!p) return null;
+  const experienceText = p.experience?.trim() || "";
+  const experienceHighlights = experienceText
+    .split(/[.,]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
 
   const handleOrder = () => {
     if (!form.service || !form.description || !form.location) { showToast("Isi semua field!", "error"); return; }
@@ -54,6 +60,36 @@ const DetailJasa = () => {
           <h3 className="font-bold mb-3">Keahlian & Layanan</h3>
           <div className="flex flex-wrap gap-2">
             {p.skills?.map(s => <Badge key={s} color="#0284C7">{s}</Badge>)}
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl p-5 border border-sky-100 bg-gradient-to-br from-sky-50 via-cyan-50 to-white shadow-sm">
+          <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-cyan-200/35 blur-2xl" aria-hidden="true" />
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 bg-white/80 border border-sky-100 rounded-full px-3 py-1.5">
+              <AppIcon name="sparkles" size={13} className="text-sky-600" />
+              <span className="text-[11px] font-bold text-sky-700 tracking-wide">PENGALAMAN KERJA</span>
+            </div>
+
+            {experienceText ? (
+              <>
+                <p className="text-sm text-gray-700 leading-6 mt-3">{experienceText}</p>
+                {experienceHighlights.length > 1 && (
+                  <div className="grid gap-2 mt-3">
+                    {experienceHighlights.map((point, index) => (
+                      <div key={`${point}-${index}`} className="flex items-start gap-2 rounded-xl border border-sky-100 bg-white/80 px-3 py-2">
+                        <AppIcon name="badgeCheck" size={14} className="text-emerald-600 mt-0.5" />
+                        <p className="text-xs text-slate-700">{point}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="mt-3 rounded-xl border border-dashed border-sky-200 bg-white/70 p-3">
+                <p className="text-sm text-gray-500">Penyedia jasa belum menambahkan pengalaman kerja.</p>
+              </div>
+            )}
           </div>
         </div>
 
