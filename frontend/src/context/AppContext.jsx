@@ -15,6 +15,10 @@ export const AppProvider = ({ children }) => {
   const [reports, setReports] = useState([]);
   const [chats, setChats] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [portfolioItems, setPortfolioItems] = useState([]);
+  const [availability, setAvailability] = useState([]);
+  const [userMetrics, setUserMetrics] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [screen, setScreen] = useState("login");
   const [selectedProvider, setSelectedProvider] = useState(null);
@@ -34,6 +38,10 @@ export const AppProvider = ({ children }) => {
     setReports(Array.isArray(data?.reports) ? data.reports : []);
     setChats(Array.isArray(data?.chats) ? data.chats : []);
     setNotifications(Array.isArray(data?.notifications) ? data.notifications : []);
+    setReviews(Array.isArray(data?.reviews) ? data.reviews : []);
+    setPortfolioItems(Array.isArray(data?.portfolioItems) ? data.portfolioItems : []);
+    setAvailability(Array.isArray(data?.availability) ? data.availability : []);
+    setUserMetrics(Array.isArray(data?.userMetrics) ? data.userMetrics : []);
   }, []);
 
   const bootstrap = useCallback(async () => {
@@ -219,6 +227,10 @@ export const AppProvider = ({ children }) => {
     reports,
     chats,
     notifications,
+    reviews,
+    portfolioItems,
+    availability,
+    userMetrics,
     currentUser,
     screen,
     setScreen,

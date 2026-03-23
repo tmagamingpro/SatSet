@@ -72,4 +72,15 @@ export const apiService = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  // Analytics endpoints
+  getAdminStats: () => request("/analytics/admin-stats"),
+  getMonthlyRevenue: () => request("/analytics/monthly-revenue"),
+  getTopProviders: (limit = 10) => request(`/analytics/top-providers?limit=${limit}`),
+  getProviderAnalytics: (id) => request(`/analytics/provider/${id}`),
+  getProviderReviews: (id) => request(`/analytics/provider/${id}/reviews`),
+  getProviderPortfolio: (id) => request(`/analytics/provider/${id}/portfolio`),
+  getProviderAvailability: (id) => request(`/analytics/provider/${id}/availability`),
+  getServiceDistribution: () => request("/analytics/service-distribution"),
+  getCategoryPerformance: () => request("/analytics/category-performance"),
+  getUserGrowth: () => request("/analytics/user-growth"),
 };

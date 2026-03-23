@@ -16,6 +16,10 @@ const createSystemService = (deps) => {
     reports: state.reports,
     notifications: state.notifications,
     chats: state.chats,
+    reviews: state.reviews,
+    portfolioItems: state.portfolioItems,
+    availability: state.availability,
+    userMetrics: state.userMetrics,
   });
 
   return {

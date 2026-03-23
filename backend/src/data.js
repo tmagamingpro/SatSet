@@ -236,3 +236,155 @@ export const reports = [
 export const notifications = [];
 
 export const chats = [];
+
+// Analytics & Reviews Data
+export const reviews = [
+  {
+    id: 1,
+    orderId: 1,
+    providerId: 2,
+    customerId: 1,
+    rating: 5,
+    comment: "Penjada listrik profesional dan rapi. Sangat merekomendasikan!",
+    createdAt: "2025-02-11",
+  },
+  {
+    id: 2,
+    orderId: 2,
+    providerId: 4,
+    customerId: 1,
+    rating: 4,
+    comment: "Kebersihan bagus, cepat selesai tapi ada beberapa area kurang menyeluruh",
+    createdAt: "2025-03-02",
+  },
+  {
+    id: 3,
+    orderId: 1,
+    providerId: 2,
+    customerId: 1,
+    rating: 5,
+    comment: "Bisa diandalkan, respon cepat, pekerjaan haisl sempurna",
+    createdAt: "2025-02-15",
+  },
+];
+
+export const portfolioItems = [
+  {
+    id: 1,
+    providerId: 2,
+    title: "Instalasi Listrik Rumah Modern",
+    image: "https://via.placeholder.com/200/0284C7/ffffff?text=Instalasi+Listrik",
+    description: "Instalasi sistem kelistrikan lengkap dengan MCB dan grounding optimal",
+    beforeAfter: true,
+    createdAt: "2025-01-15",
+  },
+  {
+    id: 2,
+    providerId: 2,
+    title: "Service AC Rutin",
+    image: "https://via.placeholder.com/200/0284C7/ffffff?text=AC+Service",
+    description: "Pembersihan evaporator dan kondensor, penambahan freon R410A",
+    beforeAfter: true,
+    createdAt: "2025-02-01",
+  },
+  {
+    id: 3,
+    providerId: 4,
+    title: "Pembersihan Kantor Corporate",
+    image: "https://via.placeholder.com/200/14B8A6/ffffff?text=Kebersihan+Kantor",
+    description: "Pembersihan menyeluruh kantor 200m² dengan produk ramah lingkungan",
+    beforeAfter: true,
+    createdAt: "2025-02-10",
+  },
+  {
+    id: 4,
+    providerId: 6,
+    title: "Catering Acara Keluarga 50 Orang",
+    image: "https://via.placeholder.com/200/0EA5E9/ffffff?text=Catering",
+    description: "Masakan nusantara berkualitas dengan presentasi menarik",
+    beforeAfter: false,
+    createdAt: "2025-03-01",
+  },
+];
+
+export const availability = [
+  {
+    providerId: 2,
+    schedule: {
+      senin: { available: true, startTime: "08:00", endTime: "17:00" },
+      selasa: { available: true, startTime: "08:00", endTime: "17:00" },
+      rabu: { available: true, startTime: "08:00", endTime: "17:00" },
+      kamis: { available: true, startTime: "08:00", endTime: "17:00" },
+      jumat: { available: true, startTime: "08:00", endTime: "16:00" },
+      sabtu: { available: true, startTime: "09:00", endTime: "15:00" },
+      minggu: { available: false, startTime: "", endTime: "" },
+    },
+    onVacation: false,
+    vacationDates: { start: "", end: "" },
+    updatedAt: "2025-03-20",
+  },
+  {
+    providerId: 4,
+    schedule: {
+      senin: { available: true, startTime: "07:00", endTime: "18:00" },
+      selasa: { available: true, startTime: "07:00", endTime: "18:00" },
+      rabu: { available: true, startTime: "07:00", endTime: "18:00" },
+      kamis: { available: true, startTime: "07:00", endTime: "18:00" },
+      jumat: { available: true, startTime: "07:00", endTime: "17:00" },
+      sabtu: { available: true, startTime: "08:00", endTime: "16:00" },
+      minggu: { available: true, startTime: "08:00", endTime: "16:00" },
+    },
+    onVacation: false,
+    vacationDates: { start: "", end: "" },
+    updatedAt: "2025-03-20",
+  },
+  {
+    providerId: 6,
+    schedule: {
+      senin: { available: true, startTime: "10:00", endTime: "20:00" },
+      selasa: { available: true, startTime: "10:00", endTime: "20:00" },
+      rabu: { available: false, startTime: "", endTime: "" },
+      kamis: { available: true, startTime: "10:00", endTime: "20:00" },
+      jumat: { available: true, startTime: "10:00", endTime: "20:00" },
+      sabtu: { available: true, startTime: "09:00", endTime: "21:00" },
+      minggu: { available: true, startTime: "09:00", endTime: "21:00" },
+    },
+    onVacation: false,
+    vacationDates: { start: "", end: "" },
+    updatedAt: "2025-03-20",
+  },
+];
+
+// Enhanced user data fields (merged with existing users above)
+// Each provider needs: responseTime, acceptanceRate, completionRate, totalReviews, avgRating
+export const userMetrics = [
+  {
+    providerId: 2,
+    responseTime: 2.5, // hours
+    acceptanceRate: 92, // percentage
+    completionRate: 98, // percentage
+    totalReviews: 143,
+    profileCompletion: 95, // percentage
+    certifications: ["Lisensi Ahli Listrik", "Sertifikat Keselamatan Kerja"],
+  },
+  {
+    providerId: 4,
+    responseTime: 1.8,
+    acceptanceRate: 88,
+    completionRate: 96,
+    totalReviews: 98,
+    profileCompletion: 88,
+    certifications: ["Sertifikat Kebersihan Profesional"],
+  },
+  {
+    providerId: 6,
+    responseTime: 3.2,
+    acceptanceRate: 85,
+    completionRate: 99,
+    totalReviews: 156,
+    profileCompletion: 92,
+    certifications: ["Sertifikat Chef Profesional", "Food Safety Certificate"],
+  },
+];
+
+
