@@ -4,8 +4,8 @@ import MainLayout from "./layouts/MainLayout";
 // Pages
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import ProviderHome from "./pages/ProviderHome";
-import Search from "./pages/Search";
+import ProviderHome from "./pages/provider-home/ProviderHome";
+import Search from "./pages/search/Search";
 import DetailJasa from "./pages/DetailJasa";
 import Orders from "./pages/Orders";
 import Jobs from "./pages/Jobs";
