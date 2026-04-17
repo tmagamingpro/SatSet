@@ -59,24 +59,8 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="px-5 -mt-9">
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            { label: "Penyedia", value: providers.length, icon: "hardHat", color: "#0284C7" },
-            { label: "Kategori", value: categories.length, icon: "clipboard", color: "#0369A1" },
-            { label: "Rating avg", value: "4.7", icon: "star", color: "#0D9488" },
-          ].map(s => (
-            <Card key={s.label} className="text-center py-4 px-2">
-              <div className="flex justify-center mb-1 text-slate-500">
-                <AppIcon name={s.icon} size={20} />
-              </div>
-              <div className="font-bold text-lg" style={{ color: s.color }}>{s.value}</div>
-              <div className="text-[11px] text-gray-400">{s.label}</div>
-            </Card>
-          ))}
-        </div>
-
-        <h3 className="font-bold text-base mb-3.5">Kategori Layanan</h3>
+      <div className="px-5">
+        <h3 className="font-bold text-base mb-4">Kategori Layanan</h3>
         <div className="grid grid-cols-4 gap-2.5 mb-7">
           {categories.map(cat => (
             <button
@@ -111,8 +95,8 @@ const Home = () => {
           </div>
         </Card>
 
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="p-3.5 bg-gradient-to-r from-emerald-50 to-cyan-50">
+        <div className="grid grid-cols-1 gap-3 mb-6">
+          <Card className="mb-3 p-3.5 bg-gradient-to-r from-emerald-50 to-cyan-50 border border-emerald-100">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <AppIcon name="zap" size={15} />
@@ -120,17 +104,6 @@ const Home = () => {
               <div>
                 <p className="text-[11px] text-gray-400">Sedang Aktif</p>
                 <p className="text-sm font-bold text-slate-800">{providers.length} penyedia</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-3.5 bg-gradient-to-r from-sky-50 to-cyan-50">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center">
-                <AppIcon name="badgeCheck" size={15} />
-              </div>
-              <div>
-                <p className="text-[11px] text-gray-400">Terverifikasi</p>
-                <p className="text-sm font-bold text-slate-800">{providers.length} akun</p>
               </div>
             </div>
           </Card>
