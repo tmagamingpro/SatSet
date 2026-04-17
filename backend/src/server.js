@@ -44,4 +44,4 @@ app = registerAnalyticsRoutes(app, deps);
 
 app.listen({ hostname: host, port });
 
-console.log(`SatSet backend running on ${host}:${port}`);
+console.log(`Link Start "pakai gaya kirito" di ${host}:${port}`);
