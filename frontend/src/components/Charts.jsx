@@ -203,6 +203,7 @@ export const ProgressRing = ({ value, max = 100, size = 120, label, color = "#02
           </span>
         </div>
       </div>
+      
       <p className="text-xs text-gray-500 text-center">{label}</p>
     </div>
   );

@@ -33,7 +33,6 @@ const Login = () => {
         <div className="text-center mb-9">
           <div className="inline-flex items-center justify-center w-18 h-18 rounded-2xl bg-sky-600 mb-3 shadow-[0_8px_24px_rgba(14,165,233,0.4)]"
             style={{ width: 72, height: 72 }}>
-            <AppIcon name="zap" size={30} className="text-white" />
           </div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight">SatSet</h1>
           <p className="text-white/60 text-sm mt-1">Jasa Cepat, Tepat, Terpercaya</p>
