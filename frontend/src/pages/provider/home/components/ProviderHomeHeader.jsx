@@ -1,6 +1,6 @@
-import Badge from "../../../components/Badge";
-import Stars from "../../../components/Stars";
-import AppIcon from "../../../components/AppIcon";
+import Badge from "../../../../components/Badge";
+import Stars from "../../../../components/Stars";
+import AppIcon from "../../../../components/AppIcon";
 
 const ProviderHomeHeader = ({
   currentUser,

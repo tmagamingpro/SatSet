@@ -1,4 +1,4 @@
-import AppIcon from "../../../components/AppIcon";
+import AppIcon from "../../../../components/AppIcon";
 
 const PROVIDER_HOME_TABS = [
   { id: "dashboard", label: "Dashboard", icon: "layoutGrid" },

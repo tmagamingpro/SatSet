@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useApp } from "../context/AppContext";
-import Card from "../components/Card";
-import Avatar from "../components/Avatar";
-import AppIcon from "../components/AppIcon";
-import Stars from "../components/Stars";
+import { useApp } from "../../context/AppContext";
+import Card from "../../components/Card";
+import Avatar from "../../components/Avatar";
+import AppIcon from "../../components/AppIcon";
+import Stars from "../../components/Stars";
 
 const Home = () => {
   const { currentUser, users, orders, categories, notifications, markNotificationsAsRead, setScreen, setSelectedProvider } = useApp();

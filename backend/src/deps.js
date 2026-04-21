@@ -11,7 +11,6 @@ import {
   reviews,
   portfolioItems,
   availability,
-  userMetrics,
 } from "./data.js";
 import { ACTIVE_ORDER_STATUSES, CLOSED_ORDER_STATUSES } from "./config.js";
 import { createId, nowIso, toRoleLabel } from "./utils/common.js";
@@ -30,7 +29,6 @@ const createAppDependencies = () => {
     reviews,
     portfolioItems,
     availability,
-    userMetrics,
   };
 
   const createNotification = (userId, message, type = "info") => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useApp } from "../context/AppContext";
-import ChatThreadList from "../components/chat/ChatThreadList";
-import ChatRoom from "../components/chat/ChatRoom";
+import { useApp } from "../../context/AppContext";
+import ChatThreadList from "../../components/chat/ChatThreadList";
+import ChatRoom from "../../components/chat/ChatRoom";
 
 const Chat = () => {
   const { currentUser, users, orders, chats, addChat, setHideNavbar, showToast } = useApp();

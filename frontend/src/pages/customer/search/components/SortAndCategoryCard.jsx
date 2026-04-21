@@ -1,5 +1,5 @@
-import Card from "../../../components/Card";
-import AppIcon from "../../../components/AppIcon";
+import Card from "../../../../components/Card";
+import AppIcon from "../../../../components/AppIcon";
 
 const sortOptions = [
   { value: "distance", label: "Terdekat", icon: "mapPin" },

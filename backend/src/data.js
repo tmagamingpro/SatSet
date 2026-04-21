@@ -354,37 +354,3 @@ export const availability = [
     updatedAt: "2025-03-20",
   },
 ];
-
-// Enhanced user data fields (merged with existing users above)
-// Each provider needs: responseTime, acceptanceRate, completionRate, totalReviews, avgRating
-export const userMetrics = [
-  {
-    providerId: 2,
-    responseTime: 2.5, // hours
-    acceptanceRate: 92, // percentage
-    completionRate: 98, // percentage
-    totalReviews: 143,
-    profileCompletion: 95, // percentage
-    certifications: ["Lisensi Ahli Listrik", "Sertifikat Keselamatan Kerja"],
-  },
-  {
-    providerId: 4,
-    responseTime: 1.8,
-    acceptanceRate: 88,
-    completionRate: 96,
-    totalReviews: 98,
-    profileCompletion: 88,
-    certifications: ["Sertifikat Kebersihan Profesional"],
-  },
-  {
-    providerId: 6,
-    responseTime: 3.2,
-    acceptanceRate: 85,
-    completionRate: 99,
-    totalReviews: 156,
-    profileCompletion: 92,
-    certifications: ["Sertifikat Chef Profesional", "Food Safety Certificate"],
-  },
-];
-
-

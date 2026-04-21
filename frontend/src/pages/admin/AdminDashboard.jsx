@@ -9,7 +9,7 @@ import { StatBox, DonutChart, BarChart, LineChart, ProgressRing } from "../../co
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const { users, orders, reviews, userMetrics, categories } = useApp();
+  const { users, orders, reviews, categories } = useApp();
   const stats = {
     pencari: users.filter(u => u.role === "pencari").length,
     penyedia: users.filter(u => u.role === "penyedia").length,
@@ -50,6 +50,19 @@ const AdminDashboard = () => {
 
   const statusColors2 = { "Menunggu": "#F59E0B", "Berlangsung": "#3B82F6", "Selesai": "#22C55E", "Dibatalkan": "#EF4444" };
   const userColors = { "Pencari": "#3B82F6", "Penyedia": "#22C55E" };
+  const getProviderMetrics = (providerId) => {
+    const providerOrders = orders.filter((order) => order.providerId === providerId);
+    const providerReviews = reviews.filter((review) => review.providerId === providerId);
+    const total = providerOrders.length;
+    const completed = providerOrders.filter((order) => order.status === "selesai").length;
+    const accepted = providerOrders.filter((order) => order.status !== "ditolak").length;
+
+    return {
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+      acceptanceRate: total > 0 ? Math.round((accepted / total) * 100) : 0,
+      totalReviews: providerReviews.length,
+    };
+  };
 
   return (
     <div className="pb-20">
@@ -265,7 +278,7 @@ const AdminDashboard = () => {
               <h3 className="font-bold mb-3">Top Providers by Rating</h3>
               <div className="space-y-3">
                 {topProviders.map((provider, idx) => {
-                  const providerMetrics = userMetrics.find(m => m.providerId === provider.id);
+                  const providerMetrics = getProviderMetrics(provider.id);
                   return (
                     <div key={provider.id} className="p-3 border border-gray-100 rounded-lg">
                       <div className="flex items-start justify-between gap-2 mb-2">
@@ -274,26 +287,24 @@ const AdminDashboard = () => {
                           <p className="text-xs text-gray-500">{provider.skills?.join(", ")}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs font-bold text-yellow-500">{provider.rating} ⭐</p>
+                          <p className="text-xs font-bold text-yellow-500">{provider.rating} *</p>
                           <p className="text-xs text-gray-500">{provider.totalJobs} jobs</p>
                         </div>
                       </div>
-                      {providerMetrics && (
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="bg-sky-50 p-1 rounded">
-                            <p className="text-xs text-gray-500">Response</p>
-                            <p className="text-xs font-bold">{providerMetrics.responseTime}h</p>
-                          </div>
-                          <div className="bg-emerald-50 p-1 rounded">
-                            <p className="text-xs text-gray-500">Completion</p>
-                            <p className="text-xs font-bold">{providerMetrics.completionRate}%</p>
-                          </div>
-                          <div className="bg-blue-50 p-1 rounded">
-                            <p className="text-xs text-gray-500">Reviews</p>
-                            <p className="text-xs font-bold">{providerMetrics.totalReviews}</p>
-                          </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-sky-50 p-1 rounded">
+                          <p className="text-xs text-gray-500">Acceptance</p>
+                          <p className="text-xs font-bold">{providerMetrics.acceptanceRate}%</p>
                         </div>
-                      )}
+                        <div className="bg-emerald-50 p-1 rounded">
+                          <p className="text-xs text-gray-500">Completion</p>
+                          <p className="text-xs font-bold">{providerMetrics.completionRate}%</p>
+                        </div>
+                        <div className="bg-blue-50 p-1 rounded">
+                          <p className="text-xs text-gray-500">Reviews</p>
+                          <p className="text-xs font-bold">{providerMetrics.totalReviews}</p>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

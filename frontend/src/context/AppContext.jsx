@@ -18,7 +18,6 @@ export const AppProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [portfolioItems, setPortfolioItems] = useState([]);
   const [availability, setAvailability] = useState([]);
-  const [userMetrics, setUserMetrics] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [screen, setScreen] = useState("login");
   const [selectedProvider, setSelectedProvider] = useState(null);
@@ -41,7 +40,6 @@ export const AppProvider = ({ children }) => {
     setReviews(Array.isArray(data?.reviews) ? data.reviews : []);
     setPortfolioItems(Array.isArray(data?.portfolioItems) ? data.portfolioItems : []);
     setAvailability(Array.isArray(data?.availability) ? data.availability : []);
-    setUserMetrics(Array.isArray(data?.userMetrics) ? data.userMetrics : []);
   }, []);
 
   const bootstrap = useCallback(async () => {
@@ -203,6 +201,20 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const addPortfolioItem = async (payload) => {
+    if (!isBackendReady) return null;
+    try {
+      const response = await apiService.addPortfolioItem(payload);
+      const portfolioItem = response?.portfolioItem;
+      if (!portfolioItem) return null;
+      setPortfolioItems((prev) => [portfolioItem, ...prev]);
+      return portfolioItem;
+    } catch (error) {
+      showToast(error?.message || "Gagal menambahkan portofolio.", "error");
+      return null;
+    }
+  };
+
   const updateReport = async (id, payload) => {
     if (!isBackendReady) return false;
     try {
@@ -230,7 +242,6 @@ export const AppProvider = ({ children }) => {
     reviews,
     portfolioItems,
     availability,
-    userMetrics,
     currentUser,
     screen,
     setScreen,
@@ -256,6 +267,7 @@ export const AppProvider = ({ children }) => {
     updateOrder,
     addChat,
     addReport,
+    addPortfolioItem,
     updateReport,
   };
 

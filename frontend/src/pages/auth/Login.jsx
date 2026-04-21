@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useApp } from "../context/AppContext";
-import Card from "../components/Card";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import AppIcon from "../components/AppIcon";
+import { useApp } from "../../context/AppContext";
+import Card from "../../components/Card";
+import Input from "../../components/Input";
+import Button from "../../components/Button";
+import AppIcon from "../../components/AppIcon";
 import Register from "./Register";
 
 const Login = () => {

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
-import TopBar from "../../layouts/TopBar";
-import Input from "../../components/Input";
-import AppIcon from "../../components/AppIcon";
-import { geocodeAddress } from "../../services/geocoding";
+import { useApp } from "../../../context/AppContext";
+import TopBar from "../../../layouts/TopBar";
+import Input from "../../../components/Input";
+import AppIcon from "../../../components/AppIcon";
+import { geocodeAddress } from "../../../services/geocoding";
 import LocationFilterCard from "./components/LocationFilterCard";
 import SortAndCategoryCard from "./components/SortAndCategoryCard";
 import SearchResultList from "./components/SearchResultList";

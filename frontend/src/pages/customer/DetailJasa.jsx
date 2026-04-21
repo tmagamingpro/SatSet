@@ -1,19 +1,22 @@
 import { useState } from "react";
-import { useApp } from "../context/AppContext";
-import TopBar from "../layouts/TopBar";
-import Avatar from "../components/Avatar";
-import Badge from "../components/Badge";
-import Button from "../components/Button";
-import Modal from "../components/Modal";
-import Input from "../components/Input";
-import AppIcon from "../components/AppIcon";
+import { useApp } from "../../context/AppContext";
+import TopBar from "../../layouts/TopBar";
+import Avatar from "../../components/Avatar";
+import Badge from "../../components/Badge";
+import Button from "../../components/Button";
+import Modal from "../../components/Modal";
+import Input from "../../components/Input";
+import AppIcon from "../../components/AppIcon";
 
 const DetailJasa = () => {
-  const { selectedProvider, setScreen, currentUser, addOrder, showToast } = useApp();
+  const { selectedProvider, setScreen, currentUser, addOrder, showToast, portfolioItems } = useApp();
   const [showOrder, setShowOrder] = useState(false);
   const [form, setForm] = useState({ service: "", description: "", location: currentUser?.address || "", price: "" });
   const p = selectedProvider;
   if (!p) return null;
+  const providerPortfolio = portfolioItems
+    .filter((item) => item.providerId === p.id)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const experienceText = p.experience?.trim() || "";
   const experienceHighlights = experienceText
     .split(/[.,]/)
@@ -104,6 +107,30 @@ const DetailJasa = () => {
               <span className="text-sm">{v}</span>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <h3 className="font-bold mb-3">Portfolio</h3>
+          {providerPortfolio.length === 0 ? (
+            <p className="text-sm text-gray-500">Penyedia jasa belum menambahkan portfolio.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {providerPortfolio.map((item) => (
+                <div key={item.id} className="rounded-xl overflow-hidden border border-slate-200 bg-white">
+                  <img src={item.image} alt={item.title} className="w-full h-36 object-cover" />
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-slate-800 line-clamp-2">{item.title}</p>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
+                    {item.beforeAfter && (
+                      <div className="mt-2">
+                        <Badge color="#0284C7">Before-After</Badge>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <Button fullWidth size="lg" onClick={() => setShowOrder(true)} icon={<AppIcon name="send" size={16} />}>Pesan Sekarang</Button>

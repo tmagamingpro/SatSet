@@ -1,9 +1,9 @@
-import Card from "../../../components/Card";
-import Badge from "../../../components/Badge";
-import Button from "../../../components/Button";
-import AppIcon from "../../../components/AppIcon";
-import { ProgressRing } from "../../../components/Charts";
-import { formatRupiah } from "../../../utils/format";
+import Card from "../../../../components/Card";
+import Badge from "../../../../components/Badge";
+import Button from "../../../../components/Button";
+import AppIcon from "../../../../components/AppIcon";
+import { ProgressRing } from "../../../../components/Charts";
+import { formatRupiah } from "../../../../utils/format";
 
 const DashboardTab = ({
   income,
@@ -71,8 +71,8 @@ const DashboardTab = ({
       <h3 className="font-bold mb-4">KPI Performa</h3>
       <div className="flex justify-around gap-4">
         <ProgressRing
-          value={myMetrics.responseTime ? Math.min(100, 100 - myMetrics.responseTime * 10) : 0}
-          label="Response Time"
+          value={myMetrics.activeRate || 0}
+          label="Order Aktif"
           color="#3B82F6"
           size={100}
         />

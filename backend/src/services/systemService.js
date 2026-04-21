@@ -19,7 +19,6 @@ const createSystemService = (deps) => {
     reviews: state.reviews,
     portfolioItems: state.portfolioItems,
     availability: state.availability,
-    userMetrics: state.userMetrics,
   });
 
   return {

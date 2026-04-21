@@ -1,8 +1,8 @@
-import Card from "../../../components/Card";
-import Avatar from "../../../components/Avatar";
-import Badge from "../../../components/Badge";
-import Stars from "../../../components/Stars";
-import AppIcon from "../../../components/AppIcon";
+import Card from "../../../../components/Card";
+import Avatar from "../../../../components/Avatar";
+import Badge from "../../../../components/Badge";
+import Stars from "../../../../components/Stars";
+import AppIcon from "../../../../components/AppIcon";
 
 const ProviderCard = ({ provider, formatDistance, onSelectProvider }) => (
   <Card onClick={() => onSelectProvider(provider)} className="p-4">

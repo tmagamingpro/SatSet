@@ -1,6 +1,6 @@
-import Card from "../../../components/Card";
-import AppIcon from "../../../components/AppIcon";
-import { StatBox, BarChart, LineChart } from "../../../components/Charts";
+import Card from "../../../../components/Card";
+import AppIcon from "../../../../components/AppIcon";
+import { StatBox, BarChart, LineChart } from "../../../../components/Charts";
 
 const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }) => (
   <>
@@ -8,10 +8,10 @@ const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }
 
     <div className="grid grid-cols-2 gap-3 mb-6">
       <StatBox
-        label="Waktu Respons"
-        value={`${myMetrics.responseTime || 0}h`}
-        color="#3B82F6"
-        icon={<AppIcon name="zap" size={20} />}
+        label="Rating Rata-rata"
+        value={Number(myMetrics.averageRating || 0).toFixed(1)}
+        color="#FBBF24"
+        icon={<AppIcon name="star" size={20} />}
       />
       <StatBox
         label="Total Pekerjaan"
@@ -27,9 +27,9 @@ const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }
       />
       <StatBox
         label="Total Review"
-        value={myReviews.length}
-        color="#FBBF24"
-        icon={<AppIcon name="star" size={20} />}
+        value={myMetrics.totalReviews || myReviews.length}
+        color="#0284C7"
+        icon={<AppIcon name="messageSquare" size={20} />}
       />
     </div>
 
@@ -58,11 +58,12 @@ const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }
       <h3 className="font-bold mb-4">Detail Metrik</h3>
       <div className="space-y-3">
         {[
-          { label: "Response Time Rata-rata", value: `${myMetrics.responseTime || 0} jam` },
+          { label: "Tingkat Order Aktif", value: `${myMetrics.activeRate || 0}%` },
+          { label: "Tingkat Pembatalan", value: `${myMetrics.cancellationRate || 0}%` },
           { label: "Acceptance Rate", value: `${myMetrics.acceptanceRate || 0}%` },
           { label: "Completion Rate", value: `${myMetrics.completionRate || 0}%` },
           { label: "Profil Completion", value: `${myMetrics.profileCompletion || 0}%` },
-          { label: "Total Reviews", value: myReviews.length },
+          { label: "Total Reviews", value: myMetrics.totalReviews || myReviews.length },
         ].map((item) => (
           <div key={item.label} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
             <span className="text-sm text-gray-600">{item.label}</span>

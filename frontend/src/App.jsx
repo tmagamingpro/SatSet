@@ -2,15 +2,15 @@ import { AppProvider, useApp } from "./context/AppContext";
 import MainLayout from "./layouts/MainLayout";
 
 // Pages
-import Login from "./pages/Login";
-import Home from "./pages/Home";
-import ProviderHome from "./pages/provider-home/ProviderHome";
-import Search from "./pages/search/Search";
-import DetailJasa from "./pages/DetailJasa";
-import Orders from "./pages/Orders";
-import Jobs from "./pages/Jobs";
-import Chat from "./pages/Chat";
-import Profile from "./pages/Profile";
+import Login from "./pages/auth/Login";
+import Home from "./pages/customer/Home";
+import ProviderHome from "./pages/provider/home/ProviderHome";
+import Search from "./pages/customer/search/Search";
+import DetailJasa from "./pages/customer/DetailJasa";
+import Orders from "./pages/shared/Orders";
+import Jobs from "./pages/provider/Jobs";
+import Chat from "./pages/shared/Chat";
+import Profile from "./pages/shared/Profile";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";

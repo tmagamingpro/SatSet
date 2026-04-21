@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../../context/AppContext";
 import ProviderHomeHeader from "./components/ProviderHomeHeader";
 import ProviderHomeTabs from "./components/ProviderHomeTabs";
 import DashboardTab from "./components/DashboardTab";
@@ -12,12 +12,13 @@ const ProviderHome = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [editScheduleMode, setEditScheduleMode] = useState(false);
   const [editedSchedule, setEditedSchedule] = useState(null);
-  const { currentUser, orders, reviews, userMetrics, portfolioItems, availability, updateUser, showToast, setScreen } = useApp();
+  const { currentUser, orders, reviews, portfolioItems, availability, updateUser, showToast, setScreen, addPortfolioItem } = useApp();
 
   const myJobs = orders.filter((o) => o.providerId === currentUser?.id);
   const myReviews = reviews.filter((r) => r.providerId === currentUser?.id);
-  const myMetrics = userMetrics.find((m) => m.providerId === currentUser?.id) || {};
-  const myPortfolio = portfolioItems.filter((p) => p.providerId === currentUser?.id);
+  const myPortfolio = portfolioItems
+    .filter((p) => p.providerId === currentUser?.id)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const myAvailability = availability.find((a) => a.providerId === currentUser?.id);
 
   const recentRequests = [...myJobs]
@@ -30,6 +31,36 @@ const ProviderHome = () => {
     done: myJobs.filter((o) => o.status === "selesai").length,
     cancelled: myJobs.filter((o) => o.status === "dibatalkan" || o.status === "ditolak").length,
   };
+  const myJobsCount = myJobs.length;
+  const acceptedCount = myJobs.filter((o) => o.status !== "ditolak").length;
+  const averageRatingRaw =
+    myReviews.length > 0
+      ? myReviews.reduce((sum, review) => sum + review.rating, 0) / myReviews.length
+      : Number(currentUser?.rating || 0);
+  const profileFields = [
+    currentUser?.name,
+    currentUser?.email,
+    currentUser?.phone,
+    currentUser?.address,
+    currentUser?.officeLocation,
+    currentUser?.experience,
+    (currentUser?.skills || []).length > 0,
+    myPortfolio.length > 0,
+    Boolean(myAvailability?.schedule),
+  ];
+  const profileCompletion = Math.round(
+    (profileFields.filter((value) => (typeof value === "boolean" ? value : Boolean(value))).length / profileFields.length) *
+      100,
+  );
+  const myMetrics = {
+    acceptanceRate: myJobsCount > 0 ? Math.round((acceptedCount / myJobsCount) * 100) : 0,
+    completionRate: myJobsCount > 0 ? Math.round((stats.done / myJobsCount) * 100) : 0,
+    activeRate: myJobsCount > 0 ? Math.round((stats.active / myJobsCount) * 100) : 0,
+    cancellationRate: myJobsCount > 0 ? Math.round((stats.cancelled / myJobsCount) * 100) : 0,
+    averageRating: averageRatingRaw,
+    profileCompletion,
+    totalReviews: myReviews.length,
+  };
 
   const income = {
     total: myJobs.filter((o) => o.status === "selesai").reduce((sum, order) => sum + (order.price || 0), 0),
@@ -40,10 +71,7 @@ const ProviderHome = () => {
   };
 
   const isActiveNow = currentUser?.isActive !== false;
-  const avgRating =
-    myReviews.length > 0
-      ? (myReviews.reduce((sum, r) => sum + r.rating, 0) / myReviews.length).toFixed(1)
-      : currentUser?.rating || 0;
+  const avgRating = averageRatingRaw.toFixed(1);
 
   const serviceBreakdown = {};
   myJobs.forEach((job) => {
@@ -70,7 +98,7 @@ const ProviderHome = () => {
           <DashboardTab
             income={income}
             stats={stats}
-            myJobsCount={myJobs.length}
+            myJobsCount={myJobsCount}
             myMetrics={myMetrics}
             currentUser={currentUser}
             recentRequests={recentRequests}
@@ -91,7 +119,12 @@ const ProviderHome = () => {
         {activeTab === "reviews" && <ReviewsTab avgRating={avgRating} myReviews={myReviews} />}
 
         {activeTab === "portfolio" && (
-          <PortfolioTab myPortfolio={myPortfolio} onGoToProfile={() => setScreen("profile")} />
+          <PortfolioTab
+            myPortfolio={myPortfolio}
+            currentUserId={currentUser?.id}
+            onAddPortfolio={addPortfolioItem}
+            showToast={showToast}
+          />
         )}
 
         {activeTab === "availability" && (

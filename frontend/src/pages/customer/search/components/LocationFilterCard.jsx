@@ -1,6 +1,6 @@
-import Card from "../../../components/Card";
-import Input from "../../../components/Input";
-import AppIcon from "../../../components/AppIcon";
+import Card from "../../../../components/Card";
+import Input from "../../../../components/Input";
+import AppIcon from "../../../../components/AppIcon";
 
 const LocationFilterCard = ({
   workAddress,

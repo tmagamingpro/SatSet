@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useApp } from "../context/AppContext";
-import Card from "../components/Card";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import AppIcon from "../components/AppIcon";
-import { geocodeAddress } from "../services/geocoding";
+import { useApp } from "../../context/AppContext";
+import Card from "../../components/Card";
+import Input from "../../components/Input";
+import Button from "../../components/Button";
+import AppIcon from "../../components/AppIcon";
+import { geocodeAddress } from "../../services/geocoding";
 
 const Register = ({ onBack }) => {
   const { addUser, showToast } = useApp();

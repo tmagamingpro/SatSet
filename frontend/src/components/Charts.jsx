@@ -197,7 +197,7 @@ export const ProgressRing = ({ value, max = 100, size = 120, label, color = "#02
             alignItems: "center",
             justifyContent: "center",
           }}
-        >
+        > 
           <span className="text-lg font-bold" style={{ color }}>
             {percentage}%
           </span>

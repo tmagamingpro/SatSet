@@ -1,5 +1,5 @@
-import Card from "../../../components/Card";
-import Stars from "../../../components/Stars";
+import Card from "../../../../components/Card";
+import Stars from "../../../../components/Stars";
 
 const ReviewsTab = ({ avgRating, myReviews }) => (
   <>
