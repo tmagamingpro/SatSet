@@ -20,7 +20,7 @@ const DashboardTab = ({
         <div>
           <p className="text-xs text-white/80">Performa Bulan Ini</p>
           <h3 className="font-bold text-base mt-0.5">{formatRupiah(income.month)}</h3>
-          <p className="text-[11px] text-white/80 mt-1">Total pemasukan dari pekerjaan selesai</p>
+          <p className="text-[11px] text-white/80 mt-1">Total pembayaran langsung yang sudah dikonfirmasi</p>
         </div>
         <button
           type="button"
@@ -58,7 +58,7 @@ const DashboardTab = ({
       <Card className="p-3.5 bg-gradient-to-r from-emerald-50 to-cyan-50">
         <p className="text-[11px] text-gray-500">Pemasukan Total</p>
         <p className="text-sm font-bold text-slate-800 mt-1">{formatRupiah(income.total)}</p>
-        <p className="text-[10px] text-gray-400 mt-1">{stats.done} pekerjaan selesai</p>
+        <p className="text-[10px] text-gray-400 mt-1">Pembayaran langsung terkonfirmasi</p>
       </Card>
       <Card className="p-3.5 bg-gradient-to-r from-sky-50 to-cyan-50">
         <p className="text-[11px] text-gray-500">Rata-rata per Pekerjaan</p>

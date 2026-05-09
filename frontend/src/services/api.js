@@ -77,4 +77,9 @@ export const apiService = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  addReview: (payload) =>
+    request("/reviews", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };

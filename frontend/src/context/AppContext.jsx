@@ -27,9 +27,35 @@ export const AppProvider = ({ children }) => {
   const [isBackendReady, setIsBackendReady] = useState(false);
   const [backendError, setBackendError] = useState("");
 
+  const enrichUsersWithProviderStats = useCallback((rawUsers = [], rawOrders = [], rawReviews = []) => {
+    return rawUsers.map((user) => {
+      if (user?.role !== "penyedia") return user;
+
+      const providerReviews = rawReviews.filter((review) => Number(review.providerId) === Number(user.id));
+      const providerCompletedJobs = rawOrders.filter(
+        (order) => Number(order.providerId) === Number(user.id) && order.status === "selesai",
+      );
+
+      const avgRating = providerReviews.length
+        ? providerReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / providerReviews.length
+        : 0;
+
+      return {
+        ...user,
+        rating: Number(avgRating.toFixed(1)),
+        totalJobs: providerCompletedJobs.length,
+      };
+    });
+  }, []);
+
   const applyBootstrapData = useCallback((data) => {
-    setUsers(Array.isArray(data?.users) ? data.users : []);
-    setOrders(Array.isArray(data?.orders) ? data.orders : []);
+    const rawUsers = Array.isArray(data?.users) ? data.users : [];
+    const rawOrders = Array.isArray(data?.orders) ? data.orders : [];
+    const rawReviews = Array.isArray(data?.reviews) ? data.reviews : [];
+    const enrichedUsers = enrichUsersWithProviderStats(rawUsers, rawOrders, rawReviews);
+
+    setUsers(enrichedUsers);
+    setOrders(rawOrders);
     setCategories(Array.isArray(data?.categories) ? data.categories : []);
     setServiceAreas(Array.isArray(data?.serviceAreas) ? data.serviceAreas : []);
     setDemoAccounts(Array.isArray(data?.demoAccounts) ? data.demoAccounts : []);
@@ -37,10 +63,11 @@ export const AppProvider = ({ children }) => {
     setReports(Array.isArray(data?.reports) ? data.reports : []);
     setChats(Array.isArray(data?.chats) ? data.chats : []);
     setNotifications(Array.isArray(data?.notifications) ? data.notifications : []);
-    setReviews(Array.isArray(data?.reviews) ? data.reviews : []);
+    setReviews(rawReviews);
     setPortfolioItems(Array.isArray(data?.portfolioItems) ? data.portfolioItems : []);
     setAvailability(Array.isArray(data?.availability) ? data.availability : []);
-  }, []);
+    setCurrentUser((prev) => (prev ? enrichedUsers.find((user) => user.id === prev.id) || prev : prev));
+  }, [enrichUsersWithProviderStats]);
 
   const bootstrap = useCallback(async () => {
     setIsBootstrapping(true);
@@ -70,10 +97,17 @@ export const AppProvider = ({ children }) => {
   }, [applyBootstrapData]);
 
   const login = async ({ email, password }) => {
-    if (!isBackendReady) throw new Error("Backend tidak aktif.");
-    const response = await apiService.login(email, password);
-    const user = response?.user;
-    if (!user) throw new Error("Data user tidak valid.");
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    const normalizedPassword = String(password || "");
+    const user = users.find(
+      (item) =>
+        String(item?.email || "").trim().toLowerCase() === normalizedEmail &&
+        String(item?.password || "") === normalizedPassword,
+    );
+    if (!user) throw new Error("Email atau password salah.");
+    if (user.role === "penyedia" && !user.isVerified) {
+      throw new Error("Akun belum diverifikasi oleh admin.");
+    }
     setCurrentUser(user);
     setScreen("home");
     setHideNavbar(false);
@@ -215,6 +249,20 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const addReview = async (payload) => {
+    if (!isBackendReady) return null;
+    try {
+      const response = await apiService.addReview(payload);
+      const review = response?.review;
+      if (!review) return null;
+      await refreshData();
+      return review;
+    } catch (error) {
+      showToast(error?.message || "Gagal mengirim ulasan.", "error");
+      return null;
+    }
+  };
+
   const updateReport = async (id, payload) => {
     if (!isBackendReady) return false;
     try {
@@ -268,6 +316,7 @@ export const AppProvider = ({ children }) => {
     addChat,
     addReport,
     addPortfolioItem,
+    addReview,
     updateReport,
   };
 

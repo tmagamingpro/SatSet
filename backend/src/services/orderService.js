@@ -14,6 +14,9 @@ const createOrderService = (deps) => {
       status: "menunggu",
       createdAt: nowIso(),
       price: Number(data.price || 0),
+      paymentMethod: data.paymentMethod || "langsung",
+      paymentStatus: data.paymentStatus || "belum_dibayar",
+      paymentRecordedAt: data.paymentRecordedAt || null,
     };
 
     state.orders.push(order);
@@ -32,6 +35,15 @@ const createOrderService = (deps) => {
     const previous = state.orders[index];
     state.orders[index] = { ...state.orders[index], ...data };
     const updated = state.orders[index];
+
+    if (updated.status === "selesai" && previous.status !== "selesai" && !data.paymentStatus) {
+      if (data.completedBy === "provider") {
+        updated.paymentStatus = "menunggu_konfirmasi";
+      } else if (data.completedBy === "customer") {
+        updated.paymentStatus = "dibayar_langsung";
+        updated.paymentRecordedAt = data.paymentRecordedAt || nowIso();
+      }
+    }
 
     const isNowCompleted = updated.status === "selesai" && previous.status !== "selesai";
     if (isNowCompleted && data.completedBy === "provider") {

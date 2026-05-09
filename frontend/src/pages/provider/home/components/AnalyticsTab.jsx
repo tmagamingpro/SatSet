@@ -2,7 +2,7 @@ import Card from "../../../../components/Card";
 import AppIcon from "../../../../components/AppIcon";
 import { StatBox, BarChart, LineChart } from "../../../../components/Charts";
 
-const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }) => (
+const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income, directPaymentMetrics }) => (
   <>
     <h3 className="font-bold text-lg mb-4">Analisis Performa</h3>
 
@@ -52,6 +52,34 @@ const AnalyticsTab = ({ myMetrics, myJobs, myReviews, serviceBreakdown, income }
         color="#0EA5E9"
         height={150}
       />
+    </Card>
+
+    <Card className="mb-6 p-4">
+      <h3 className="font-bold mb-4">Pembayaran Langsung</h3>
+      <div className="grid grid-cols-2 gap-3">
+        <StatBox
+          label="Order Bayar Langsung"
+          value={directPaymentMetrics?.totalOrders || 0}
+          color="#0284C7"
+          icon={<AppIcon name="wallet" size={20} />}
+        />
+        <StatBox
+          label="Sudah Dibayar"
+          value={directPaymentMetrics?.paidOrders || 0}
+          color="#22C55E"
+          icon={<AppIcon name="badgeCheck" size={20} />}
+        />
+      </div>
+      <div className="mt-3 space-y-2 text-sm">
+        <div className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2">
+          <span className="text-gray-500">Menunggu Konfirmasi Bayar</span>
+          <span className="font-bold text-slate-800">{directPaymentMetrics?.waitingOrders || 0} order</span>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2">
+          <span className="text-gray-500">Nilai Dibayar Langsung</span>
+          <span className="font-bold text-slate-800">Rp {(directPaymentMetrics?.paidValue || 0).toLocaleString("id-ID")}</span>
+        </div>
+      </div>
     </Card>
 
     <Card className="p-4">

@@ -14,6 +14,15 @@ const Jobs = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
+  const paymentStatusMeta = {
+    belum_dibayar: { label: "Belum Dibayar", color: "#F59E0B" },
+    menunggu_konfirmasi: { label: "Menunggu Konfirmasi Bayar", color: "#3B82F6" },
+    dibayar_langsung: { label: "Sudah Dibayar Langsung", color: "#22C55E" },
+  };
+  const getEffectivePaymentStatus = (order) => {
+    if (order.paymentStatus) return order.paymentStatus;
+    return order.status === "selesai" ? "dibayar_langsung" : "belum_dibayar";
+  };
 
   const myJobs = orders.filter(o => o.providerId === currentUser?.id);
   const filtered = filter === "semua" ? myJobs : myJobs.filter(o => o.status === filter);
@@ -97,6 +106,12 @@ const Jobs = () => {
                   <AppIcon name="wallet" size={12} /> {formatRupiah(order.price)}
                 </div>
               )}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Badge color="#0284C7">{`PEMBAYARAN ${(order.paymentMethod || "langsung").toUpperCase()}`}</Badge>
+                <Badge color={(paymentStatusMeta[getEffectivePaymentStatus(order)] || paymentStatusMeta.belum_dibayar).color}>
+                  {(paymentStatusMeta[getEffectivePaymentStatus(order)] || paymentStatusMeta.belum_dibayar).label}
+                </Badge>
+              </div>
               <div className="text-[11px] text-gray-400 mt-2 inline-flex items-center gap-1">
                 <AppIcon name="calendar" size={11} /> {formatDate(order.createdAt, { year: "numeric", month: "short", day: "numeric" })}
               </div>
@@ -113,7 +128,24 @@ const Jobs = () => {
                 </div>
               )}
               {order.status === "berlangsung" && (
-                <Button size="sm" variant="success" className="mt-3" onClick={() => { updateOrder(order.id, { status: "selesai", completedAt: new Date().toISOString(), completedBy: "provider" }); showToast("Pekerjaan selesai!", "success"); }} icon={<AppIcon name="badgeCheck" size={13} />}>Tandai Selesai</Button>
+                <Button
+                  size="sm"
+                  variant="success"
+                  className="mt-3"
+                  onClick={() => {
+                    updateOrder(order.id, {
+                      status: "selesai",
+                      completedAt: new Date().toISOString(),
+                      completedBy: "provider",
+                      paymentMethod: order.paymentMethod || "langsung",
+                      paymentStatus: "menunggu_konfirmasi",
+                    });
+                    showToast("Pekerjaan selesai! Menunggu konfirmasi pembayaran langsung.", "success");
+                  }}
+                  icon={<AppIcon name="badgeCheck" size={13} />}
+                >
+                  Tandai Selesai
+                </Button>
               )}
             </Card>
           );

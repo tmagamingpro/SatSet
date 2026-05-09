@@ -26,7 +26,14 @@ const DetailJasa = () => {
 
   const handleOrder = () => {
     if (!form.service || !form.description || !form.location) { showToast("Isi semua field!", "error"); return; }
-    addOrder({ customerId: currentUser.id, providerId: p.id, ...form, price: parseInt(form.price, 10) || 0 });
+    addOrder({
+      customerId: currentUser.id,
+      providerId: p.id,
+      ...form,
+      price: parseInt(form.price, 10) || 0,
+      paymentMethod: "langsung",
+      paymentStatus: "belum_dibayar",
+    });
     showToast("Permintaan berhasil dikirim!", "success");
     setShowOrder(false);
     setScreen("orders");
@@ -152,6 +159,12 @@ const DetailJasa = () => {
           <Input label="Deskripsi Pekerjaan" value={form.description} onChange={v => setForm(f => ({ ...f, description: v }))} placeholder="Jelaskan pekerjaan yang dibutuhkan" required />
           <Input label="Lokasi" value={form.location} onChange={v => setForm(f => ({ ...f, location: v }))} placeholder="Alamat lengkap" icon={<AppIcon name="mapPin" size={16} />} required />
           <Input label="Estimasi Harga (Rp)" type="number" value={form.price} onChange={v => setForm(f => ({ ...f, price: v }))} placeholder="0" icon={<AppIcon name="wallet" size={16} />} />
+          <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-3.5 py-2.5">
+            <p className="text-xs font-semibold text-emerald-700">Pembayaran</p>
+            <p className="text-xs text-emerald-700 mt-1">
+              Pembayaran dilakukan langsung ke penyedia jasa (di luar aplikasi)
+            </p>
+          </div>
           <Button fullWidth onClick={handleOrder} size="lg">Kirim Permintaan</Button>
         </div>
       </Modal>

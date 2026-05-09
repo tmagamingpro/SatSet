@@ -12,6 +12,7 @@ import { registerChatRoutes } from "./routes/chatRoutes.js";
 import { registerNotificationRoutes } from "./routes/notificationRoutes.js";
 import { registerReportRoutes } from "./routes/reportRoutes.js";
 import { registerPortfolioRoutes } from "./routes/portfolioRoutes.js";
+import { registerReviewRoutes } from "./routes/reviewRoutes.js";
 
 const deps = createAppDependencies();
 
@@ -41,6 +42,7 @@ app = registerChatRoutes(app, deps);
 app = registerNotificationRoutes(app, deps);
 app = registerReportRoutes(app, deps);
 app = registerPortfolioRoutes(app, deps);
+app = registerReviewRoutes(app, deps);
 
 app.listen({ hostname: host, port });
 

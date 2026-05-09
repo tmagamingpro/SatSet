@@ -9,7 +9,7 @@ import AppIcon from "../../components/AppIcon";
 import { formatRupiah, formatDate } from "../../utils/format";
 
 const Orders = () => {
-  const { orders, currentUser, users, statusColors, updateOrder, addReport, showToast } = useApp();
+  const { orders, currentUser, users, statusColors, updateOrder, addReport, addReview, showToast } = useApp();
   const [filter, setFilter] = useState("semua");
   const [showReport, setShowReport] = useState(false);
   const [showRating, setShowRating] = useState(false);
@@ -19,7 +19,17 @@ const Orders = () => {
   const [report, setReport] = useState("");
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
+  const [ratingOrder, setRatingOrder] = useState(null);
   const isProvider = currentUser?.role === "penyedia";
+  const paymentStatusMeta = {
+    belum_dibayar: { label: "Belum Dibayar", color: "#F59E0B" },
+    menunggu_konfirmasi: { label: "Menunggu Konfirmasi Bayar", color: "#3B82F6" },
+    dibayar_langsung: { label: "Sudah Dibayar Langsung", color: "#22C55E" },
+  };
+  const getEffectivePaymentStatus = (order) => {
+    if (order.paymentStatus) return order.paymentStatus;
+    return order.status === "selesai" ? "dibayar_langsung" : "belum_dibayar";
+  };
 
   const myOrders = orders.filter(o => (isProvider ? o.providerId === currentUser?.id : o.customerId === currentUser?.id));
   const filtered = filter === "semua" ? myOrders : myOrders.filter(o => o.status === filter);
@@ -49,7 +59,40 @@ const Orders = () => {
     showToast("Pesanan dibatalkan dengan alasan.", "warning");
     closeCancelModal();
   };
-  const handleConfirm = (order) => { updateOrder(order.id, { status: "selesai", completedAt: new Date().toISOString(), completedBy: "customer" }); showToast("Pekerjaan dikonfirmasi selesai!", "success"); setShowRating(true); };
+  const handleConfirm = (order) => {
+    updateOrder(order.id, {
+      status: "selesai",
+      completedAt: new Date().toISOString(),
+      completedBy: "customer",
+      paymentMethod: order.paymentMethod || "langsung",
+      paymentStatus: "dibayar_langsung",
+      paymentRecordedAt: new Date().toISOString(),
+    });
+    showToast("Pekerjaan dikonfirmasi selesai dan pembayaran langsung tercatat.", "success");
+    setRatingOrder(order);
+    setRating(5);
+    setReview("");
+    setShowRating(true);
+  };
+  const handleSubmitRating = async () => {
+    if (!ratingOrder) {
+      showToast("Order untuk dinilai tidak ditemukan.", "error");
+      return;
+    }
+    const created = await addReview({
+      orderId: ratingOrder.id,
+      providerId: ratingOrder.providerId,
+      customerId: ratingOrder.customerId,
+      rating,
+      comment: review.trim(),
+    });
+    if (!created) return;
+    showToast("Penilaian berhasil dikirim!", "success");
+    setShowRating(false);
+    setRatingOrder(null);
+    setRating(5);
+    setReview("");
+  };
   const handleSubmitReport = async () => {
     if (!report.trim()) {
       showToast("Deskripsi laporan wajib diisi.", "error");
@@ -118,6 +161,12 @@ const Orders = () => {
                 <span className="break-words leading-relaxed">{order.location}</span>
               </div>
               {order.price > 0 && <div className="text-sm font-semibold text-sky-600 inline-flex items-center gap-1"><AppIcon name="wallet" size={12} /> {formatRupiah(order.price)}</div>}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Badge color="#0284C7">{`PEMBAYARAN ${(order.paymentMethod || "langsung").toUpperCase()}`}</Badge>
+                <Badge color={(paymentStatusMeta[getEffectivePaymentStatus(order)] || paymentStatusMeta.belum_dibayar).color}>
+                  {(paymentStatusMeta[getEffectivePaymentStatus(order)] || paymentStatusMeta.belum_dibayar).label}
+                </Badge>
+              </div>
               <div className="text-[11px] text-gray-400 mt-2 inline-flex items-center gap-1"><AppIcon name="calendar" size={11} /> {formatDate(order.createdAt, { year: "numeric", month: "short", day: "numeric" })}</div>
               {(order.status === "ditolak" || order.status === "dibatalkan") && order.cancellationReason && (
                 <div className="mt-2 rounded-lg border border-rose-100 bg-rose-50 p-2.5 text-left">
@@ -151,7 +200,14 @@ const Orders = () => {
         </div>
       </Modal>
 
-      <Modal open={showRating} onClose={() => setShowRating(false)} title="Beri Penilaian">
+      <Modal
+        open={showRating}
+        onClose={() => {
+          setShowRating(false);
+          setRatingOrder(null);
+        }}
+        title="Beri Penilaian"
+      >
         <div className="flex flex-col gap-3.5 text-center">
           <p className="text-gray-400 text-sm">Bagaimana pengalaman Anda?</p>
           <div className="flex justify-center gap-2">
@@ -166,7 +222,7 @@ const Orders = () => {
             <textarea value={review} onChange={e => setReview(e.target.value)} rows={3} placeholder="Tuliskan pengalaman Anda..."
               className="w-full px-3.5 py-2.5 border-2 border-gray-200 rounded-lg text-sm resize-none" />
           </div>
-          <Button fullWidth size="lg" onClick={() => { showToast(`Rating ${rating} berhasil diberikan!`, "success"); setShowRating(false); }} icon={<AppIcon name="star" size={14} />}>Kirim Penilaian</Button>
+          <Button fullWidth size="lg" onClick={handleSubmitRating} icon={<AppIcon name="star" size={14} />}>Kirim Penilaian</Button>
         </div>
       </Modal>
 

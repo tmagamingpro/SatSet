@@ -20,6 +20,10 @@ const ProviderHome = () => {
     .filter((p) => p.providerId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const myAvailability = availability.find((a) => a.providerId === currentUser?.id);
+  const getEffectivePaymentStatus = (order) => {
+    if (order.paymentStatus) return order.paymentStatus;
+    return order.status === "selesai" ? "dibayar_langsung" : "belum_dibayar";
+  };
 
   const recentRequests = [...myJobs]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -63,11 +67,33 @@ const ProviderHome = () => {
   };
 
   const income = {
-    total: myJobs.filter((o) => o.status === "selesai").reduce((sum, order) => sum + (order.price || 0), 0),
+    total: myJobs
+      .filter(
+        (o) =>
+          o.status === "selesai" &&
+          (getEffectivePaymentStatus(o) === "dibayar_langsung" || (o.paymentMethod || "langsung") !== "langsung"),
+      )
+      .reduce((sum, order) => sum + (order.price || 0), 0),
     month: myJobs
-      .filter((o) => o.status === "selesai" && new Date(o.createdAt).getMonth() === new Date().getMonth())
+      .filter(
+        (o) =>
+          o.status === "selesai" &&
+          (getEffectivePaymentStatus(o) === "dibayar_langsung" || (o.paymentMethod || "langsung") !== "langsung") &&
+          new Date(o.createdAt).getMonth() === new Date().getMonth(),
+      )
       .reduce((sum, order) => sum + (order.price || 0), 0),
     avgPerJob: myJobs.length > 0 ? myJobs.reduce((sum, order) => sum + (order.price || 0), 0) / myJobs.length : 0,
+  };
+  const directPaymentOrders = myJobs.filter((job) => (job.paymentMethod || "langsung") === "langsung");
+  const directPaymentMetrics = {
+    totalOrders: directPaymentOrders.length,
+    paidOrders: directPaymentOrders.filter((job) => getEffectivePaymentStatus(job) === "dibayar_langsung").length,
+    waitingOrders: directPaymentOrders.filter(
+      (job) => job.status === "selesai" && getEffectivePaymentStatus(job) !== "dibayar_langsung",
+    ).length,
+    paidValue: directPaymentOrders
+      .filter((job) => getEffectivePaymentStatus(job) === "dibayar_langsung")
+      .reduce((sum, job) => sum + (job.price || 0), 0),
   };
 
   const isActiveNow = currentUser?.isActive !== false;
@@ -113,6 +139,7 @@ const ProviderHome = () => {
             myReviews={myReviews}
             serviceBreakdown={serviceBreakdown}
             income={income}
+            directPaymentMetrics={directPaymentMetrics}
           />
         )}
 
