@@ -1,54 +1,46 @@
 import { validateCreateReportPayload } from "../validators/reportValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createReportService = (deps) => {
-  const { state, createId, nowIso, toRoleLabel } = deps;
-
-  const create = (payload) => {
+class ReportService extends BaseService {
+  create(payload) {
     const validationError = validateCreateReportPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
 
-    const reporter = state.users.find((user) => user.id === Number(data.fromUserId));
-    if (!reporter) {
-      return { status: 404, body: { message: "Pelapor tidak ditemukan." } };
-    }
+    const reporter = this.state.users.find((user) => user.id === Number(data.fromUserId));
+    if (!reporter) return this.fail(404, "Pelapor tidak ditemukan.");
 
     const report = {
-      id: createId(),
+      id: this.createId(),
       fromUserId: reporter.id,
       from: reporter.name,
-      type: data.type || toRoleLabel(reporter.role),
+      type: data.type || this.deps.toRoleLabel(reporter.role),
       desc: data.desc,
-      date: nowIso().slice(0, 10),
+      date: this.nowIso().slice(0, 10),
       status: "pending",
       adminNote: "",
       orderId: data.orderId ? Number(data.orderId) : undefined,
     };
-    state.reports.push(report);
-    return { status: 201, body: { report } };
-  };
+    this.state.reports.push(report);
+    return this.ok(201, { report });
+  }
 
-  const update = (reportId, payload) => {
+  update(reportId, payload) {
     const id = Number(reportId);
-    const index = state.reports.findIndex((report) => report.id === id);
-    if (index === -1) {
-      return { status: 404, body: { message: "Laporan tidak ditemukan." } };
-    }
+    const index = this.state.reports.findIndex((report) => report.id === id);
+    if (index === -1) return this.fail(404, "Laporan tidak ditemukan.");
 
     const data = payload ?? {};
-    state.reports[index] = {
-      ...state.reports[index],
-      status: data.status || state.reports[index].status,
-      adminNote: data.adminNote ?? state.reports[index].adminNote,
-      resolvedAt: data.status === "selesai" ? nowIso() : state.reports[index].resolvedAt,
+    this.state.reports[index] = {
+      ...this.state.reports[index],
+      status: data.status || this.state.reports[index].status,
+      adminNote: data.adminNote ?? this.state.reports[index].adminNote,
+      resolvedAt: data.status === "selesai" ? this.nowIso() : this.state.reports[index].resolvedAt,
     };
-    return { status: 200, body: { report: state.reports[index] } };
-  };
+    return this.ok(200, { report: this.state.reports[index] });
+  }
+}
 
-  return {
-    create,
-    update,
-  };
-};
+const createReportService = (deps) => new ReportService(deps);
 
 export { createReportService };

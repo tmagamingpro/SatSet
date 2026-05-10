@@ -1,29 +1,25 @@
 import { validateCreateNotificationPayload } from "../validators/notificationValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createNotificationService = (deps) => {
-  const { state, createNotification } = deps;
-
-  const create = (payload) => {
+class NotificationService extends BaseService {
+  create(payload) {
     const validationError = validateCreateNotificationPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
 
-    const notification = createNotification(Number(data.userId), data.message, data.type || "info");
-    return { status: 201, body: { notification } };
-  };
+    const notification = this.deps.createNotification(Number(data.userId), data.message, data.type || "info");
+    return this.ok(201, { notification });
+  }
 
-  const markRead = (userId) => {
+  markRead(userId) {
     const targetUserId = Number(userId);
-    for (let i = 0; i < state.notifications.length; i += 1) {
-      if (state.notifications[i].userId === targetUserId) state.notifications[i].read = true;
+    for (let i = 0; i < this.state.notifications.length; i += 1) {
+      if (this.state.notifications[i].userId === targetUserId) this.state.notifications[i].read = true;
     }
-    return { status: 200, body: { success: true } };
-  };
+    return this.ok(200, { success: true });
+  }
+}
 
-  return {
-    create,
-    markRead,
-  };
-};
+const createNotificationService = (deps) => new NotificationService(deps);
 
 export { createNotificationService };

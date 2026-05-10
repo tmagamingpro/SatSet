@@ -1,9 +1,8 @@
 import { validateCreateChatPayload } from "../validators/chatValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createChatService = (deps) => {
-  const { state, createId, nowIso, findActiveOrderForChat } = deps;
-
-  const create = (payload) => {
+class ChatService extends BaseService {
+  create(payload) {
     const validationError = validateCreateChatPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
@@ -12,36 +11,31 @@ const createChatService = (deps) => {
     const message = (data.message || "").trim();
     const orderId = data.orderId;
 
-    const sender = state.users.find((user) => user.id === senderId);
-    const receiver = state.users.find((user) => user.id === receiverId);
-    if (!sender || !receiver) {
-      return { status: 404, body: { message: "Pengguna chat tidak ditemukan." } };
-    }
+    const sender = this.state.users.find((user) => user.id === senderId);
+    const receiver = this.state.users.find((user) => user.id === receiverId);
+    if (!sender || !receiver) return this.fail(404, "Pengguna chat tidak ditemukan.");
 
-    const activeOrder = findActiveOrderForChat({ senderId, receiverId, orderId });
+    const activeOrder = this.deps.findActiveOrderForChat({ senderId, receiverId, orderId });
     if (!activeOrder) {
-      return {
-        status: 403,
-        body: {
-          message:
-            "Chat hanya tersedia saat ada transaksi aktif (menunggu/berlangsung). Setelah transaksi selesai, chat akan direset.",
-        },
-      };
+      return this.fail(
+        403,
+        "Chat hanya tersedia saat ada transaksi aktif (menunggu/berlangsung). Setelah transaksi selesai, chat akan direset.",
+      );
     }
 
     const chat = {
-      id: createId(),
+      id: this.createId(),
       orderId: activeOrder.id,
       senderId,
       receiverId,
       message,
-      createdAt: nowIso(),
+      createdAt: this.nowIso(),
     };
-    state.chats.push(chat);
-    return { status: 200, body: { chat } };
-  };
+    this.state.chats.push(chat);
+    return this.ok(200, { chat });
+  }
+}
 
-  return { create };
-};
+const createChatService = (deps) => new ChatService(deps);
 
 export { createChatService };

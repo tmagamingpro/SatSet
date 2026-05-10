@@ -1,21 +1,20 @@
 import { validateRegisterUserPayload } from "../validators/userValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createUserService = (deps) => {
-  const { state, createId, nowIso, clearChatsByOrder } = deps;
-
-  const register = (payload) => {
+class UserService extends BaseService {
+  register(payload) {
     const validationError = validateRegisterUserPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
 
-    const emailInUse = state.users.some((user) => user.email === data.email);
+    const emailInUse = this.state.users.some((user) => user.email === data.email);
     if (emailInUse) {
-      return { status: 409, body: { message: "Email sudah terdaftar." } };
+      return this.fail(409, "Email sudah terdaftar.");
     }
 
     const isProvider = data.role === "penyedia";
     const user = {
-      id: createId(),
+      id: this.createId(),
       ...data,
       avatar: data.name.slice(0, 2).toUpperCase(),
       isVerified: data.role === "pencari",
@@ -27,53 +26,49 @@ const createUserService = (deps) => {
       skills: [],
       rating: 0,
       totalJobs: 0,
-      createdAt: nowIso(),
+      createdAt: this.nowIso(),
     };
 
-    state.users.push(user);
-    return { status: 201, body: { user } };
-  };
+    this.state.users.push(user);
+    return this.ok(201, { user });
+  }
 
-  const update = (userId, payload) => {
+  update(userId, payload) {
     const id = Number(userId);
-    const index = state.users.findIndex((user) => user.id === id);
+    const index = this.state.users.findIndex((user) => user.id === id);
     if (index === -1) {
-      return { status: 404, body: { message: "User tidak ditemukan." } };
+      return this.fail(404, "User tidak ditemukan.");
     }
 
-    state.users[index] = { ...state.users[index], ...(payload ?? {}) };
-    return { status: 200, body: { user: state.users[index] } };
-  };
+    this.state.users[index] = { ...this.state.users[index], ...(payload ?? {}) };
+    return this.ok(200, { user: this.state.users[index] });
+  }
 
-  const remove = (userId) => {
+  remove(userId) {
     const id = Number(userId);
-    const index = state.users.findIndex((user) => user.id === id);
+    const index = this.state.users.findIndex((user) => user.id === id);
     if (index === -1) {
-      return { status: 404, body: { message: "User tidak ditemukan." } };
+      return this.fail(404, "User tidak ditemukan.");
     }
 
-    const [deletedUser] = state.users.splice(index, 1);
-    for (let i = state.orders.length - 1; i >= 0; i -= 1) {
-      const matchedOrder = state.orders[i].customerId === id || state.orders[i].providerId === id;
+    const [deletedUser] = this.state.users.splice(index, 1);
+    for (let i = this.state.orders.length - 1; i >= 0; i -= 1) {
+      const matchedOrder = this.state.orders[i].customerId === id || this.state.orders[i].providerId === id;
       if (!matchedOrder) continue;
-      clearChatsByOrder(state.orders[i].id);
-      state.orders.splice(i, 1);
+      this.deps.clearChatsByOrder(this.state.orders[i].id);
+      this.state.orders.splice(i, 1);
     }
-    for (let i = state.notifications.length - 1; i >= 0; i -= 1) {
-      if (state.notifications[i].userId === id) state.notifications.splice(i, 1);
+    for (let i = this.state.notifications.length - 1; i >= 0; i -= 1) {
+      if (this.state.notifications[i].userId === id) this.state.notifications.splice(i, 1);
     }
-    for (let i = state.chats.length - 1; i >= 0; i -= 1) {
-      if (state.chats[i].senderId === id || state.chats[i].receiverId === id) state.chats.splice(i, 1);
+    for (let i = this.state.chats.length - 1; i >= 0; i -= 1) {
+      if (this.state.chats[i].senderId === id || this.state.chats[i].receiverId === id) this.state.chats.splice(i, 1);
     }
 
-    return { status: 200, body: { user: deletedUser } };
-  };
+    return this.ok(200, { user: deletedUser });
+  }
+}
 
-  return {
-    register,
-    update,
-    remove,
-  };
-};
+const createUserService = (deps) => new UserService(deps);
 
 export { createUserService };

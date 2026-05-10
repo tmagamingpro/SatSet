@@ -1,30 +1,31 @@
-const createSystemService = (deps) => {
-  const { state, nowIso } = deps;
+import { BaseService } from "./baseService.js";
 
-  const getHealth = () => ({
-    ok: true,
-    timestamp: nowIso(),
-  });
+class SystemService extends BaseService {
+  getHealth() {
+    return {
+      ok: true,
+      timestamp: this.nowIso(),
+    };
+  }
 
-  const getBootstrap = () => ({
-    users: state.users,
-    orders: state.orders,
-    categories: state.categories,
-    serviceAreas: state.serviceAreas,
-    demoAccounts: state.demoAccounts,
-    statusColors: state.statusColors,
-    reports: state.reports,
-    notifications: state.notifications,
-    chats: state.chats,
-    reviews: state.reviews,
-    portfolioItems: state.portfolioItems,
-    availability: state.availability,
-  });
+  getBootstrap() {
+    return {
+      users: this.state.users,
+      orders: this.state.orders,
+      categories: this.state.categories,
+      serviceAreas: this.state.serviceAreas,
+      demoAccounts: this.state.demoAccounts,
+      statusColors: this.state.statusColors,
+      reports: this.state.reports,
+      notifications: this.state.notifications,
+      chats: this.state.chats,
+      reviews: this.state.reviews,
+      portfolioItems: this.state.portfolioItems,
+      availability: this.state.availability,
+    };
+  }
+}
 
-  return {
-    getHealth,
-    getBootstrap,
-  };
-};
+const createSystemService = (deps) => new SystemService(deps);
 
 export { createSystemService };

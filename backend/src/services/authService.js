@@ -1,26 +1,23 @@
 import { validateLoginPayload } from "../validators/authValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createAuthService = (deps) => {
-  const { state } = deps;
-
-  const login = (payload) => {
+class AuthService extends BaseService {
+  login(payload) {
     const validationError = validateLoginPayload(payload);
     if (validationError) return validationError;
     const { email, password } = payload;
 
-    const user = state.users.find((item) => item.email === email && item.password === password);
-    if (!user) {
-      return { status: 401, body: { message: "Email atau password salah." } };
-    }
+    const user = this.state.users.find((item) => item.email === email && item.password === password);
+    if (!user) return this.fail(401, "Email atau password salah.");
 
     if (user.role === "penyedia" && !user.isVerified) {
-      return { status: 403, body: { message: "Akun belum diverifikasi oleh admin." } };
+      return this.fail(403, "Akun belum diverifikasi oleh admin.");
     }
 
-    return { status: 200, body: { user } };
-  };
+    return this.ok(200, { user });
+  }
+}
 
-  return { login };
-};
+const createAuthService = (deps) => new AuthService(deps);
 
 export { createAuthService };

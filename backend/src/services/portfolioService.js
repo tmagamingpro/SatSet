@@ -1,43 +1,38 @@
-const createPortfolioService = (deps) => {
-  const { state, createId, nowIso } = deps;
+import { BaseService } from "./baseService.js";
 
-  const create = (payload) => {
+class PortfolioService extends BaseService {
+  create(payload) {
     const data = payload ?? {};
     const providerId = Number(data.providerId);
 
     if (!providerId || !data.title || !data.description) {
-      return {
-        status: 400,
-        body: { message: "providerId, title, dan description wajib diisi." },
-      };
+      return this.fail(400, "providerId, title, dan description wajib diisi.");
     }
 
-    const provider = state.users.find((user) => user.id === providerId && user.role === "penyedia");
+    const provider = this.state.users.find((user) => user.id === providerId && user.role === "penyedia");
     if (!provider) {
-      return { status: 404, body: { message: "Penyedia jasa tidak ditemukan." } };
+      return this.fail(404, "Penyedia jasa tidak ditemukan.");
     }
 
     if (!data.image || typeof data.image !== "string") {
-      return { status: 400, body: { message: "Gambar portofolio wajib diisi." } };
+      return this.fail(400, "Gambar portofolio wajib diisi.");
     }
 
     const portfolioItem = {
-      id: createId(),
+      id: this.createId(),
       providerId,
       title: data.title.trim(),
       description: data.description.trim(),
       image: data.image,
       beforeAfter: Boolean(data.beforeAfter),
-      createdAt: nowIso(),
+      createdAt: this.nowIso(),
     };
 
-    state.portfolioItems.push(portfolioItem);
-    return { status: 201, body: { portfolioItem } };
-  };
+    this.state.portfolioItems.push(portfolioItem);
+    return this.ok(201, { portfolioItem });
+  }
+}
 
-  return {
-    create,
-  };
-};
+const createPortfolioService = (deps) => new PortfolioService(deps);
 
 export { createPortfolioService };

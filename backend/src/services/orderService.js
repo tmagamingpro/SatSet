@@ -1,63 +1,116 @@
 import { validateCreateOrderPayload } from "../validators/orderValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createOrderService = (deps) => {
-  const { state, createId, nowIso, CLOSED_ORDER_STATUSES, createNotification, clearChatsByOrder } = deps;
+class CompletionNotifier {
+  constructor(deps) {
+    this.deps = deps;
+  }
 
-  const create = (payload) => {
+  // To be implemented by subclasses.
+  notify(_previous, _data) {}
+}
+
+class ProviderCompletionNotifier extends CompletionNotifier {
+  notify(previous) {
+    this.deps.createNotification(
+      previous.customerId,
+      `Pekerjaan "${previous.service}" dinyatakan selesai oleh penyedia jasa.`,
+      "job_completed",
+    );
+  }
+}
+
+class CustomerCompletionNotifier extends CompletionNotifier {
+  notify(previous) {
+    this.deps.createNotification(
+      previous.providerId,
+      `Pekerjaan "${previous.service}" telah dikonfirmasi selesai oleh pencari jasa.`,
+      "job_completed",
+    );
+  }
+}
+
+class ProviderCancellationNotifier extends CompletionNotifier {
+  notify(previous, data) {
+    const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
+    this.deps.createNotification(
+      previous.customerId,
+      `Pesanan "${previous.service}" dibatalkan oleh penyedia jasa.${reasonText}`,
+      "job_cancelled",
+    );
+  }
+}
+
+class CustomerCancellationNotifier extends CompletionNotifier {
+  notify(previous, data) {
+    const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
+    this.deps.createNotification(
+      previous.providerId,
+      `Pesanan "${previous.service}" dibatalkan oleh pencari jasa.${reasonText}`,
+      "job_cancelled",
+    );
+  }
+}
+
+class OrderService extends BaseService {
+  constructor(deps) {
+    super(deps);
+    this.completionNotifiers = {
+      provider: new ProviderCompletionNotifier(deps),
+      customer: new CustomerCompletionNotifier(deps),
+    };
+    this.cancellationNotifiers = {
+      provider: new ProviderCancellationNotifier(deps),
+      customer: new CustomerCancellationNotifier(deps),
+    };
+  }
+
+  create(payload) {
     const validationError = validateCreateOrderPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
 
     const order = {
-      id: createId(),
+      id: this.createId(),
       ...data,
       status: "menunggu",
-      createdAt: nowIso(),
+      createdAt: this.nowIso(),
       price: Number(data.price || 0),
       paymentMethod: data.paymentMethod || "langsung",
       paymentStatus: data.paymentStatus || "belum_dibayar",
       paymentRecordedAt: data.paymentRecordedAt || null,
     };
 
-    state.orders.push(order);
-    createNotification(order.providerId, "Ada permintaan jasa baru!", "new_request");
-    return { status: 201, body: { order } };
-  };
+    this.state.orders.push(order);
+    this.deps.createNotification(order.providerId, "Ada permintaan jasa baru!", "new_request");
+    return this.ok(201, { order });
+  }
 
-  const update = (orderId, payload) => {
+  update(orderId, payload) {
     const id = Number(orderId);
-    const index = state.orders.findIndex((order) => order.id === id);
+    const index = this.state.orders.findIndex((order) => order.id === id);
     if (index === -1) {
-      return { status: 404, body: { message: "Order tidak ditemukan." } };
+      return this.fail(404, "Order tidak ditemukan.");
     }
 
     const data = payload ?? {};
-    const previous = state.orders[index];
-    state.orders[index] = { ...state.orders[index], ...data };
-    const updated = state.orders[index];
+    const previous = this.state.orders[index];
+    this.state.orders[index] = { ...this.state.orders[index], ...data };
+    const updated = this.state.orders[index];
 
     if (updated.status === "selesai" && previous.status !== "selesai" && !data.paymentStatus) {
       if (data.completedBy === "provider") {
         updated.paymentStatus = "menunggu_konfirmasi";
       } else if (data.completedBy === "customer") {
         updated.paymentStatus = "dibayar_langsung";
-        updated.paymentRecordedAt = data.paymentRecordedAt || nowIso();
+        updated.paymentRecordedAt = data.paymentRecordedAt || this.nowIso();
       }
     }
 
     const isNowCompleted = updated.status === "selesai" && previous.status !== "selesai";
-    if (isNowCompleted && data.completedBy === "provider") {
-      createNotification(
-        previous.customerId,
-        `Pekerjaan "${previous.service}" dinyatakan selesai oleh penyedia jasa.`,
-        "job_completed",
-      );
-    } else if (isNowCompleted && data.completedBy === "customer") {
-      createNotification(
-        previous.providerId,
-        `Pekerjaan "${previous.service}" telah dikonfirmasi selesai oleh pencari jasa.`,
-        "job_completed",
-      );
+    if (isNowCompleted) {
+      const notifier = this.completionNotifiers[data.completedBy];
+      if (notifier) notifier.notify(previous, data);
     }
 
     const isRejectedByProvider =
@@ -65,12 +118,7 @@ const createOrderService = (deps) => {
       previous.status !== updated.status &&
       data.cancelledBy === "provider";
     if (isRejectedByProvider) {
-      const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
-      createNotification(
-        previous.customerId,
-        `Pesanan "${previous.service}" dibatalkan oleh penyedia jasa.${reasonText}`,
-        "job_cancelled",
-      );
+      this.cancellationNotifiers.provider.notify(previous, data);
     }
 
     const isCancelledByCustomer =
@@ -78,25 +126,17 @@ const createOrderService = (deps) => {
       previous.status !== "dibatalkan" &&
       data.cancelledBy === "customer";
     if (isCancelledByCustomer) {
-      const reasonText = data.cancellationReason ? ` Alasan: ${data.cancellationReason}` : "";
-      createNotification(
-        previous.providerId,
-        `Pesanan "${previous.service}" dibatalkan oleh pencari jasa.${reasonText}`,
-        "job_cancelled",
-      );
+      this.cancellationNotifiers.customer.notify(previous, data);
     }
 
-    if (CLOSED_ORDER_STATUSES.has(updated.status)) {
-      clearChatsByOrder(updated.id);
+    if (this.deps.CLOSED_ORDER_STATUSES.has(updated.status)) {
+      this.deps.clearChatsByOrder(updated.id);
     }
 
-    return { status: 200, body: { order: updated } };
-  };
+    return this.ok(200, { order: updated });
+  }
+}
 
-  return {
-    create,
-    update,
-  };
-};
+const createOrderService = (deps) => new OrderService(deps);
 
 export { createOrderService };

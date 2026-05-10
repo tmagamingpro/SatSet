@@ -1,9 +1,8 @@
 import { validateCreateReviewPayload } from "../validators/reviewValidator.js";
+import { BaseService } from "./baseService.js";
 
-const createReviewService = (deps) => {
-  const { state, createId, nowIso, createNotification } = deps;
-
-  const create = (payload) => {
+class ReviewService extends BaseService {
+  create(payload) {
     const validationError = validateCreateReviewPayload(payload);
     if (validationError) return validationError;
 
@@ -14,45 +13,43 @@ const createReviewService = (deps) => {
     const rating = Number(data.rating);
     const comment = String(data.comment ?? "").trim();
 
-    const order = state.orders.find((item) => item.id === orderId);
-    if (!order) return { status: 404, body: { message: "Order tidak ditemukan." } };
+    const order = this.state.orders.find((item) => item.id === orderId);
+    if (!order) return this.fail(404, "Order tidak ditemukan.");
     if (order.providerId !== providerId || order.customerId !== customerId) {
-      return { status: 400, body: { message: "Data review tidak sesuai dengan order." } };
+      return this.fail(400, "Data review tidak sesuai dengan order.");
     }
 
-    const existingIndex = state.reviews.findIndex(
+    const existingIndex = this.state.reviews.findIndex(
       (item) => item.orderId === orderId && item.providerId === providerId && item.customerId === customerId,
     );
 
     let review;
     if (existingIndex >= 0) {
-      state.reviews[existingIndex] = {
-        ...state.reviews[existingIndex],
+      this.state.reviews[existingIndex] = {
+        ...this.state.reviews[existingIndex],
         rating,
         comment,
-        createdAt: nowIso(),
+        createdAt: this.nowIso(),
       };
-      review = state.reviews[existingIndex];
+      review = this.state.reviews[existingIndex];
     } else {
       review = {
-        id: createId(),
+        id: this.createId(),
         orderId,
         providerId,
         customerId,
         rating,
         comment,
-        createdAt: nowIso(),
+        createdAt: this.nowIso(),
       };
-      state.reviews.push(review);
+      this.state.reviews.push(review);
     }
 
-    createNotification(providerId, `Anda menerima ulasan baru untuk pekerjaan "${order.service}".`, "new_review");
-    return { status: existingIndex >= 0 ? 200 : 201, body: { review } };
-  };
+    this.deps.createNotification(providerId, `Anda menerima ulasan baru untuk pekerjaan "${order.service}".`, "new_review");
+    return this.ok(existingIndex >= 0 ? 200 : 201, { review });
+  }
+}
 
-  return {
-    create,
-  };
-};
+const createReviewService = (deps) => new ReviewService(deps);
 
 export { createReviewService };
