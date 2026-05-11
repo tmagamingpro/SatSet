@@ -2,7 +2,7 @@ import { validateCreateReviewPayload } from "../validators/reviewValidator.js";
 import { BaseService } from "./baseService.js";
 
 class ReviewService extends BaseService {
-  create(payload) {
+  async create(payload) {
     const validationError = validateCreateReviewPayload(payload);
     if (validationError) return validationError;
 
@@ -46,6 +46,7 @@ class ReviewService extends BaseService {
     }
 
     this.deps.createNotification(providerId, `Anda menerima ulasan baru untuk pekerjaan "${order.service}".`, "new_review");
+    await this.deps.persist("reviews", "notifications");
     return this.ok(existingIndex >= 0 ? 200 : 201, { review });
   }
 }

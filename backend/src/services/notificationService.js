@@ -2,20 +2,22 @@ import { validateCreateNotificationPayload } from "../validators/notificationVal
 import { BaseService } from "./baseService.js";
 
 class NotificationService extends BaseService {
-  create(payload) {
+  async create(payload) {
     const validationError = validateCreateNotificationPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
 
     const notification = this.deps.createNotification(Number(data.userId), data.message, data.type || "info");
+    await this.deps.persist("notifications");
     return this.ok(201, { notification });
   }
 
-  markRead(userId) {
+  async markRead(userId) {
     const targetUserId = Number(userId);
     for (let i = 0; i < this.state.notifications.length; i += 1) {
       if (this.state.notifications[i].userId === targetUserId) this.state.notifications[i].read = true;
     }
+    await this.deps.persist("notifications");
     return this.ok(200, { success: true });
   }
 }

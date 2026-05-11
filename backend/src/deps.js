@@ -1,34 +1,44 @@
-import {
-  categories,
-  chats,
-  demoAccounts,
-  notifications,
-  orders,
-  reports,
-  serviceAreas,
-  statusColors,
-  users,
-  reviews,
-  portfolioItems,
-  availability,
-} from "./data.js";
 import { ACTIVE_ORDER_STATUSES, CLOSED_ORDER_STATUSES } from "./config.js";
 import { createId, nowIso, toRoleLabel } from "./utils/common.js";
+import { createSupabaseStateStore } from "./supabaseState.js";
 
-const createAppDependencies = () => {
-  const state = {
-    users,
-    orders,
-    categories,
-    serviceAreas,
-    demoAccounts,
-    statusColors,
-    reports,
-    notifications,
-    chats,
-    reviews,
-    portfolioItems,
-    availability,
+const createInitialState = () => ({
+  users: [],
+  orders: [],
+  categories: [],
+  serviceAreas: [],
+  demoAccounts: [],
+  statusColors: {},
+  reports: [],
+  notifications: [],
+  chats: [],
+  reviews: [],
+  portfolioItems: [],
+  availability: [],
+});
+
+const createAppDependencies = async () => {
+  const initialState = createInitialState();
+  const store = createSupabaseStateStore({
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    initialState,
+  });
+  let state = { ...initialState };
+  let supabaseEnabled = store.enabled;
+  try {
+    state = await store.loadState();
+  } catch (error) {
+    supabaseEnabled = false;
+    console.warn(`[Supabase] ${error.message}`);
+    console.warn("[Supabase] Fallback ke state kosong. Jalankan SQL backend/supabase/app_state.sql lalu restart backend.");
+  }
+
+  const persist = async (...keys) => {
+    if (!supabaseEnabled) return;
+    for (const key of keys) {
+      await store.saveKey(key, state[key]);
+    }
   };
 
   const createNotification = (userId, message, type = "info") => {
@@ -76,6 +86,8 @@ const createAppDependencies = () => {
 
   return {
     state,
+    persist,
+    supabaseEnabled,
     nowIso,
     createId,
     toRoleLabel,

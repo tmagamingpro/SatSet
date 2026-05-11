@@ -4,7 +4,7 @@ import { sendServiceResult } from "./controllerUtils.js";
 const createAuthController = (deps) => {
   const service = createAuthService(deps);
 
-  const login = ({ body, set }) => sendServiceResult(set, service.login(body));
+  const login = async ({ body, set }) => sendServiceResult(set, service.login(body));
 
   return { login };
 };

@@ -14,7 +14,7 @@ import { registerReportRoutes } from "./routes/reportRoutes.js";
 import { registerPortfolioRoutes } from "./routes/portfolioRoutes.js";
 import { registerReviewRoutes } from "./routes/reviewRoutes.js";
 
-const deps = createAppDependencies();
+const deps = await createAppDependencies();
 
 let app = new Elysia({ adapter: node() }).use(
   cors({
@@ -47,3 +47,4 @@ app = registerReviewRoutes(app, deps);
 app.listen({ hostname: host, port });
 
 console.log(`Link Start "pakai gaya kirito" di ${host}:${port}`);
+console.log(`Data source: ${deps.supabaseEnabled ? "Supabase app_state" : "Local dummy data"}`);

@@ -2,7 +2,7 @@ import { validateCreateChatPayload } from "../validators/chatValidator.js";
 import { BaseService } from "./baseService.js";
 
 class ChatService extends BaseService {
-  create(payload) {
+  async create(payload) {
     const validationError = validateCreateChatPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
@@ -32,6 +32,7 @@ class ChatService extends BaseService {
       createdAt: this.nowIso(),
     };
     this.state.chats.push(chat);
+    await this.deps.persist("chats");
     return this.ok(200, { chat });
   }
 }

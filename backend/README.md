@@ -15,6 +15,13 @@ Copy-Item .env.example .env
 ```
 
 Nilai `HOST`, `PORT`, dan `CORS_ORIGINS` diatur lewat file `.env`.
+Untuk mode Supabase, isi juga:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Lalu jalankan SQL di [supabase/app_state.sql](/c:/Users/User/Documents/TEGAR/TEGAR/website-pertama/vscode/reactjs/SatSet/backend/supabase/app_state.sql).
+SQL tersebut membuat tabel `app_state` sekaligus mengisi seluruh data awal aplikasi.
 
 ## Opsi Bun (opsional)
 

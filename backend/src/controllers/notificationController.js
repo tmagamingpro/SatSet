@@ -4,8 +4,8 @@ import { sendServiceResult } from "./controllerUtils.js";
 const createNotificationController = (deps) => {
   const service = createNotificationService(deps);
 
-  const create = ({ body, set }) => sendServiceResult(set, service.create(body));
-  const markRead = ({ params, set }) => sendServiceResult(set, service.markRead(params.userId));
+  const create = async ({ body, set }) => sendServiceResult(set, service.create(body));
+  const markRead = async ({ params, set }) => sendServiceResult(set, service.markRead(params.userId));
 
   return {
     create,

@@ -1,7 +1,7 @@
 import { BaseService } from "./baseService.js";
 
 class PortfolioService extends BaseService {
-  create(payload) {
+  async create(payload) {
     const data = payload ?? {};
     const providerId = Number(data.providerId);
 
@@ -29,6 +29,7 @@ class PortfolioService extends BaseService {
     };
 
     this.state.portfolioItems.push(portfolioItem);
+    await this.deps.persist("portfolioItems");
     return this.ok(201, { portfolioItem });
   }
 }

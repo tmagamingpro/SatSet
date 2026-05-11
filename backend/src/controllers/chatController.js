@@ -4,7 +4,7 @@ import { sendServiceResult } from "./controllerUtils.js";
 const createChatController = (deps) => {
   const service = createChatService(deps);
 
-  const create = ({ body, set }) => sendServiceResult(set, service.create(body));
+  const create = async ({ body, set }) => sendServiceResult(set, service.create(body));
 
   return { create };
 };

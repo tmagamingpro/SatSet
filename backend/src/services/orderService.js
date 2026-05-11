@@ -65,7 +65,7 @@ class OrderService extends BaseService {
     };
   }
 
-  create(payload) {
+  async create(payload) {
     const validationError = validateCreateOrderPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
@@ -83,10 +83,11 @@ class OrderService extends BaseService {
 
     this.state.orders.push(order);
     this.deps.createNotification(order.providerId, "Ada permintaan jasa baru!", "new_request");
+    await this.deps.persist("orders", "notifications");
     return this.ok(201, { order });
   }
 
-  update(orderId, payload) {
+  async update(orderId, payload) {
     const id = Number(orderId);
     const index = this.state.orders.findIndex((order) => order.id === id);
     if (index === -1) {
@@ -133,6 +134,7 @@ class OrderService extends BaseService {
       this.deps.clearChatsByOrder(updated.id);
     }
 
+    await this.deps.persist("orders", "notifications", "chats");
     return this.ok(200, { order: updated });
   }
 }

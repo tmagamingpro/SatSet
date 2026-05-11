@@ -2,7 +2,7 @@ import { validateRegisterUserPayload } from "../validators/userValidator.js";
 import { BaseService } from "./baseService.js";
 
 class UserService extends BaseService {
-  register(payload) {
+  async register(payload) {
     const validationError = validateRegisterUserPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
@@ -30,10 +30,11 @@ class UserService extends BaseService {
     };
 
     this.state.users.push(user);
+    await this.deps.persist("users");
     return this.ok(201, { user });
   }
 
-  update(userId, payload) {
+  async update(userId, payload) {
     const id = Number(userId);
     const index = this.state.users.findIndex((user) => user.id === id);
     if (index === -1) {
@@ -41,10 +42,11 @@ class UserService extends BaseService {
     }
 
     this.state.users[index] = { ...this.state.users[index], ...(payload ?? {}) };
+    await this.deps.persist("users");
     return this.ok(200, { user: this.state.users[index] });
   }
 
-  remove(userId) {
+  async remove(userId) {
     const id = Number(userId);
     const index = this.state.users.findIndex((user) => user.id === id);
     if (index === -1) {
@@ -65,6 +67,7 @@ class UserService extends BaseService {
       if (this.state.chats[i].senderId === id || this.state.chats[i].receiverId === id) this.state.chats.splice(i, 1);
     }
 
+    await this.deps.persist("users", "orders", "notifications", "chats");
     return this.ok(200, { user: deletedUser });
   }
 }

@@ -2,7 +2,7 @@ import { validateCreateReportPayload } from "../validators/reportValidator.js";
 import { BaseService } from "./baseService.js";
 
 class ReportService extends BaseService {
-  create(payload) {
+  async create(payload) {
     const validationError = validateCreateReportPayload(payload);
     if (validationError) return validationError;
     const data = payload ?? {};
@@ -22,10 +22,11 @@ class ReportService extends BaseService {
       orderId: data.orderId ? Number(data.orderId) : undefined,
     };
     this.state.reports.push(report);
+    await this.deps.persist("reports");
     return this.ok(201, { report });
   }
 
-  update(reportId, payload) {
+  async update(reportId, payload) {
     const id = Number(reportId);
     const index = this.state.reports.findIndex((report) => report.id === id);
     if (index === -1) return this.fail(404, "Laporan tidak ditemukan.");
@@ -37,6 +38,7 @@ class ReportService extends BaseService {
       adminNote: data.adminNote ?? this.state.reports[index].adminNote,
       resolvedAt: data.status === "selesai" ? this.nowIso() : this.state.reports[index].resolvedAt,
     };
+    await this.deps.persist("reports");
     return this.ok(200, { report: this.state.reports[index] });
   }
 }
